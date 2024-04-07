@@ -1,0 +1,11 @@
+{
+    "id": "fuzzy-note-creator",
+    "name": "Fuzzy Note Creator",
+    "version": "0.1.0",
+    "minAppVersion": "1.5.12",
+    "description": "Create notes in folders with the help of a fuzzy finder",
+    "author": "HaloGamer33",
+    "authorUrl": "https://github.com/HaloGamer33",
+    "fundingUrl": "https://ko-fi.com/halogamer33",
+    "isDesktopOnly": true
+}
