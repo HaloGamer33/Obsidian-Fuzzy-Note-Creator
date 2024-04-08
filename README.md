@@ -72,7 +72,7 @@ if you have it turned off, then a notice will appear on the top right of the scr
 ### 3. **File extension**
 
 When creating any note with the plugin, the file extension that you define on this setting will be appended to the end of the note title that you provide. If you set anything other
-than `.md` (Markdown) then obsidian will try to open the file in system's the default application after it has been created. If left empty, it will default to `.md`.
+than `.md` (Markdown) then Obsidian will try to open the file in system's the default application after it has been created. If left empty, it will default to `.md`.
 
 ### 4. **Name for untitled notes**
 
