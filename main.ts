@@ -219,6 +219,11 @@ export class NoteTitleModal extends SuggestModal<string> {
                     return;
                 }
 
+                if (noteName.match(/^[\\\/\s]+$/)) {
+                    new Notice(`The note title must not be only '\\' or '/'`);
+                    return;
+                }
+
                 if (noteName.match(/(\/|\\)/) !== null) {
                     let noteNameWithDirs = normalizePath(noteName).split('/').map(link => link.trim()).filter(link => link.length !== 0);
                     let parentDirs = `${path}/`;
