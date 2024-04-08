@@ -12,8 +12,8 @@ This Obsidian plugin allows users to quickly create new notes using a fuzzy sear
 - Note in new tab
 - Note in current tab
 - Note in new window
-- Note in current window spliting horizontaly
-- Note in current window spliting verticaly
+- Note in current window splitting horizontally
+- Note in current window splitting vertically
 
 The names explain what they do, but I would recommend trying them out to see which functionality you like the most. You may also 
 set a keybind to open the note creator (settings -> hotkeys).
@@ -21,7 +21,7 @@ set a keybind to open the note creator (settings -> hotkeys).
 ## Bulk note creation
 
 Each one of the commands has a 'bulk' version, this means that after selecting the desired folder the creation dialogue 
-wont close after the new note has been created, this allows you to create multiple files in the same folder without having to call the 
+won't close after the new note has been created, this allows you to create multiple files in the same folder without having to call the 
 command multiple times.
 
 ## Creating a New Note
@@ -33,9 +33,9 @@ command multiple times.
 5. Enter the title and press Enter.
 6. The note will be opened in the Obsidian workspace based on the command that you selected.
 
-## Use of `/` and `\` when inputing the note title
+## Use of `/` and `\` when inputting the note title
 
-If you use either `/` or `\` in the title note, the plugin assumes that you want to create the parent folders for you note, for example:
+If you use either `/` or `\` in the title note, the plugin assumes that you want to create the parent folders for your note, for example:
 
 Let's say that you selected `Parent Folder` as the folder where you want to create the note, and then you input `This is a folder/This is a note`
 as the title of the note, the plugin will then create the folder `This is a folder` inside of `Parent Folder` which would result in a path that
@@ -66,17 +66,17 @@ Setting turned off
 
 ### 2. **Allow untitled notes**
 
-If you have this setting turned on then when you provide no title name the plugin will create a new note based on the title that you give on the `Name for untitled notes` setting,
+If you have this setting turned on, then when you provide no title name, the plugin will create a new note based on the title that you give on the `Name for untitled notes` setting,
 if you have it turned off, then a notice will appear on the top right of the screen asking you to set a title for your note.
 
 ### 3. **File extension**
 
 When creating any note with the plugin, the file extension that you define on this setting will be appended to the end of the note title that you provide. If you set anything other
-than `.md` (Markdown) then obsidian will try to open the file in system's the default application after it has been created. If left empty it will default to `.md`.
+than `.md` (Markdown) then obsidian will try to open the file in system's the default application after it has been created. If left empty, it will default to `.md`.
 
-### 4. **Name for untitles notes**
+### 4. **Name for untitled notes**
 
-This is the name that the plugin will use when you provide no title for your new note and the setting `Allow untitled notes` is turned on. If left empty it will default to
+This is the name that the plugin will use when you provide no title for your new note and the setting `Allow untitled notes` is turned on. If left empty, it will default to
 `Untitled`.
 
 # Contributing
