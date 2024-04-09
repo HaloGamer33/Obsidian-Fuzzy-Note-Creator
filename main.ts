@@ -195,7 +195,7 @@ export class NoteTitleModal extends SuggestModal<string> {
         this.resultContainerEl.hide();
 
         let previousModalJustClosed = true;
-        this.inputEl.addEventListener('keyup', handleEnterKey)
+        this.inputEl.addEventListener('keyup', handleEnterKey.bind(this))
         async function handleEnterKey(event: KeyboardEvent) {
             const {key} = event;
             if (key === 'Enter') {
