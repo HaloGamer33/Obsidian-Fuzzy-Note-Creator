@@ -198,130 +198,130 @@ export class NoteTitleModal extends SuggestModal<string> {
         this.inputEl.addEventListener('keyup', handleEnterKey.bind(this))
         async function handleEnterKey(event: KeyboardEvent) {
             const {key} = event;
-            if (key === 'Enter') {
-                if (previousModalJustClosed) {
-                    previousModalJustClosed = false;
-                    return;
-                }
+            if (key !== 'Enter') { return }
 
-                const untrimmedNoteName = this.inputEl.value;
-                let noteName = untrimmedNoteName.trim();
-
-                if (noteName.length == 0 && !settings.allowUntitledNotes) {
-                    new Notice('Add a title to the note' , 2000);
-                    return;
-                }
-
-                if (noteName.length == 0 && settings.allowUntitledNotes) {
-                    noteName = (settings.untitledNoteName.length == 0) ? DEFAULT_SETTINGS.untitledNoteName! : settings.untitledNoteName!;
-                }
-
-                const windowsCompatibility: boolean = (
-                    navigator.userAgent.toLowerCase().contains('windows') || settings.windowsNoteTitleCompatibility
-                );
-
-                if (windowsCompatibility && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
-                    new Notice(`The note title must not include any of this characters: < > : " ? | *`, 2000);
-                    return;
-                }
-
-                if (noteName.match(/^[\\\/\s]+$/)) {
-                    new Notice(`The note title must not be only '\\' or '/'`);
-                    return;
-                }
-
-                if (noteName.match(/(\/|\\)/) !== null) {
-                    let noteNameWithDirs = normalizePath(noteName).split('/').map(link => link.trim()).filter(link => link.length !== 0);
-                    let parentDirs = `${path}/`;
-                    for (let i = 0; i < noteNameWithDirs.length - 1; i++) {
-                        noteNameWithDirs[i] += '/';
-                        parentDirs += noteNameWithDirs[i];
-                    }
-                    parentDirs = parentDirs.slice(0, -1);
-
-                    if (this.app.vault.getFolderByPath(parentDirs) === null) {
-                        this.app.vault.createFolder(parentDirs);
-                    }
-                    noteName = noteNameWithDirs.join('');
-                }
-
-                let noteExtension = settings.defaultNoteExtension;
-                if (noteExtension.length == 0) {
-                    noteExtension = DEFAULT_SETTINGS.defaultNoteExtension!;
-                }
-
-                if (navigator.userAgent.toLowerCase().contains('windows') && noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null) {
-                    new Notice(`The note extension must not include any of this characters: < > : " \ ? | * /`, 2000);
-                    return;
-                }
-
-                if (noteExtension.match(/(\/)/) !== null) {
-                    new Notice(`The note extension must not include the character: /`, 2000);
-                    return;
-                }
-
-                const notePath = (path.length == 1) ? `${noteName}${noteExtension}` : `${path}/${noteName}${noteExtension}`;
-
-                const normalizedNotePath= normalizePath(notePath);
-
-                const fileAlreadyExists = (this.app.vault.getFileByPath(normalizedNotePath) !== null) ? true : false;
-
-                if (fileAlreadyExists) {
-                    new Notice(`That note already exists`, 2000);
-                    return;
-                }
-
-                const newNote = await this.app.vault.create(`${normalizedNotePath}`, '');
-
-                if (newNote == null) {
-                    new Notice('Error opening the file, report issue to GitHub', 2000);
-                    return;
-                }
-
-                if (newNote.extension !== 'md') {
-                    new Notice(`Created note ${noteName}${noteExtension}, opening it on the system's default application if there is one`, 4000);
-                }
-
-                // this.app.workspace.getLeaf('window').openFile(newNote);
-                switch (leafMode) {
-                    case 'new-tab':
-                        this.app.workspace.getLeaf('tab').openFile(newNote);
-                        this.close();
-                    break;
-                    case 'current-tab':
-                        this.app.workspace.getLeaf(false).openFile(newNote);
-                        this.close();
-                    break;
-                    case 'new-window':
-                        this.app.workspace.getLeaf('window').openFile(newNote);
-                        this.close();
-                    break;
-                    case 'split-horizontal':
-                        this.app.workspace.getLeaf('split', 'horizontal').openFile(newNote);
-                        this.close();
-                    break;
-                    case 'split-vertical':
-                        this.app.workspace.getLeaf('split', 'vertical').openFile(newNote);
-                        this.close();
-                    break;
-                    case 'bulk-new-tab':
-                        this.app.workspace.getLeaf('tab').openFile(newNote);
-                    break;
-                    case 'bulk-current-tab':
-                        this.app.workspace.getLeaf(false).openFile(newNote);
-                    break;
-                    case 'bulk-new-window':
-                        this.app.workspace.getLeaf('window').openFile(newNote);
-                    break;
-                    case 'bulk-split-horizontal':
-                        this.app.workspace.getLeaf('split', 'horizontal').openFile(newNote);
-                    break;
-                    case 'bulk-split-vertical':
-                        this.app.workspace.getLeaf('split', 'vertical').openFile(newNote);
-                    break;
-                }
-                this.inputEl.value = '';
+            if (previousModalJustClosed) {
+                previousModalJustClosed = false;
+                return;
             }
+
+            const untrimmedNoteName = this.inputEl.value;
+            let noteName = untrimmedNoteName.trim();
+
+            if (noteName.length == 0 && !settings.allowUntitledNotes) {
+                new Notice('Add a title to the note' , 2000);
+                return;
+            }
+
+            if (noteName.length == 0 && settings.allowUntitledNotes) {
+                noteName = (settings.untitledNoteName.length == 0) ? DEFAULT_SETTINGS.untitledNoteName! : settings.untitledNoteName!;
+            }
+
+            const windowsCompatibility: boolean = (
+                navigator.userAgent.toLowerCase().contains('windows') || settings.windowsNoteTitleCompatibility
+            );
+
+            if (windowsCompatibility && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
+                new Notice(`The note title must not include any of this characters: < > : " ? | *`, 2000);
+                return;
+            }
+
+            if (noteName.match(/^[\\\/\s]+$/)) {
+                new Notice(`The note title must not be only '\\' or '/'`);
+                return;
+            }
+
+            if (noteName.match(/(\/|\\)/) !== null) {
+                let noteNameWithDirs = normalizePath(noteName).split('/').map(link => link.trim()).filter(link => link.length !== 0);
+                let parentDirs = `${path}/`;
+                for (let i = 0; i < noteNameWithDirs.length - 1; i++) {
+                    noteNameWithDirs[i] += '/';
+                    parentDirs += noteNameWithDirs[i];
+                }
+                parentDirs = parentDirs.slice(0, -1);
+
+                if (this.app.vault.getFolderByPath(parentDirs) === null) {
+                    this.app.vault.createFolder(parentDirs);
+                }
+                noteName = noteNameWithDirs.join('');
+            }
+
+            let noteExtension = settings.defaultNoteExtension;
+            if (noteExtension.length == 0) {
+                noteExtension = DEFAULT_SETTINGS.defaultNoteExtension!;
+            }
+
+            if (navigator.userAgent.toLowerCase().contains('windows') && noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null) {
+                new Notice(`The note extension must not include any of this characters: < > : " \ ? | * /`, 2000);
+                return;
+            }
+
+            if (noteExtension.match(/(\/)/) !== null) {
+                new Notice(`The note extension must not include the character: /`, 2000);
+                return;
+            }
+
+            const notePath = (path.length == 1) ? `${noteName}${noteExtension}` : `${path}/${noteName}${noteExtension}`;
+
+            const normalizedNotePath= normalizePath(notePath);
+
+            const fileAlreadyExists = (this.app.vault.getFileByPath(normalizedNotePath) !== null) ? true : false;
+
+            if (fileAlreadyExists) {
+                new Notice(`That note already exists`, 2000);
+                return;
+            }
+
+            const newNote = await this.app.vault.create(`${normalizedNotePath}`, '');
+
+            if (newNote == null) {
+                new Notice('Error opening the file, report issue to GitHub', 2000);
+                return;
+            }
+
+            if (newNote.extension !== 'md') {
+                new Notice(`Created note ${noteName}${noteExtension}, opening it on the system's default application if there is one`, 4000);
+            }
+
+            // this.app.workspace.getLeaf('window').openFile(newNote);
+            switch (leafMode) {
+                case 'new-tab':
+                    this.app.workspace.getLeaf('tab').openFile(newNote);
+                    this.close();
+                break;
+                case 'current-tab':
+                    this.app.workspace.getLeaf(false).openFile(newNote);
+                    this.close();
+                break;
+                case 'new-window':
+                    this.app.workspace.getLeaf('window').openFile(newNote);
+                    this.close();
+                break;
+                case 'split-horizontal':
+                    this.app.workspace.getLeaf('split', 'horizontal').openFile(newNote);
+                    this.close();
+                break;
+                case 'split-vertical':
+                    this.app.workspace.getLeaf('split', 'vertical').openFile(newNote);
+                    this.close();
+                break;
+                case 'bulk-new-tab':
+                    this.app.workspace.getLeaf('tab').openFile(newNote);
+                break;
+                case 'bulk-current-tab':
+                    this.app.workspace.getLeaf(false).openFile(newNote);
+                break;
+                case 'bulk-new-window':
+                    this.app.workspace.getLeaf('window').openFile(newNote);
+                break;
+                case 'bulk-split-horizontal':
+                    this.app.workspace.getLeaf('split', 'horizontal').openFile(newNote);
+                break;
+                case 'bulk-split-vertical':
+                    this.app.workspace.getLeaf('split', 'vertical').openFile(newNote);
+                break;
+            }
+            this.inputEl.value = '';
         }
     }
 
