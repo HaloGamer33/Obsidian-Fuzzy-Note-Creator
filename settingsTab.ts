@@ -3,6 +3,7 @@ import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 
 export interface FuzzyNoteCreatorSettings {
     showInstructions: boolean;
+    windowsNoteTitleCompatibility: boolean,
     allowUntitledNotes: boolean;
     defaultNoteExtension: string;
     untitledNoteName: string;
@@ -10,6 +11,7 @@ export interface FuzzyNoteCreatorSettings {
 
 export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
     showInstructions: true,
+    windowsNoteTitleCompatibility: false,
     allowUntitledNotes: true,
     defaultNoteExtension: '.md',
     untitledNoteName: 'Untitled',
@@ -39,6 +41,20 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
             });
         });
+
+        if (navigator.userAgent.toLowerCase().contains('windows') === false) {
+            new Setting(containerEl)
+            .setName('Windows note title compatibility')
+            .setDesc('When turned on, the plugin won\'t allow you to title notes with Window\'s illegal characters even if you are not on Windows. If running on windows this setting has no effect.')
+                .addToggle((slider) => {
+                    slider
+                    .setValue(this.plugin.settings.windowsNoteTitleCompatibility)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.windowsNoteTitleCompatibility = value;
+                        await this.plugin.saveSettings();
+                    });
+                });
+        }
 
         new Setting(containerEl)
         .setName('Allow untitled notes')

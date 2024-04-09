@@ -214,7 +214,11 @@ export class NoteTitleModal extends SuggestModal<string> {
                     noteName = (settings.untitledNoteName.length == 0) ? DEFAULT_SETTINGS.untitledNoteName! : settings.untitledNoteName!;
                 }
 
-                if (navigator.userAgent.toLowerCase().contains('windows') && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
+                const windowsCompatibility: boolean = (
+                    navigator.userAgent.toLowerCase().contains('windows') || settings.windowsNoteTitleCompatibility
+                );
+
+                if (windowsCompatibility && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
                     new Notice(`The note title must not include any of this characters: < > : " ? | *`, 2000);
                     return;
                 }
