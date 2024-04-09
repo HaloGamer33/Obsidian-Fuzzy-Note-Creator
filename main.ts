@@ -214,7 +214,7 @@ export class NoteTitleModal extends SuggestModal<string> {
                     noteName = (settings.untitledNoteName.length == 0) ? DEFAULT_SETTINGS.untitledNoteName! : settings.untitledNoteName!;
                 }
 
-                if (navigator.platform == 'Win32' && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
+                if (navigator.userAgent.toLowerCase().contains('windows') && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
                     new Notice(`The note title must not include any of this characters: < > : " ? | *`, 2000);
                     return;
                 }
@@ -244,7 +244,7 @@ export class NoteTitleModal extends SuggestModal<string> {
                     noteExtension = DEFAULT_SETTINGS.defaultNoteExtension!;
                 }
 
-                if (navigator.platform == 'Win32' && noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null) {
+                if (navigator.userAgent.toLowerCase().contains('windows') && noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null) {
                     new Notice(`The note extension must not include any of this characters: < > : " \ ? | * /`, 2000);
                     return;
                 }
