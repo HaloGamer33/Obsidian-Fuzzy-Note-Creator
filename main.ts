@@ -195,7 +195,9 @@ export class NoteTitleModal extends SuggestModal<string> {
         this.resultContainerEl.hide();
 
         let previousModalJustClosed = true;
-        this.inputEl.addEventListener('keyup', async ({key}) => {
+        this.inputEl.addEventListener('keyup', handleEnterKey)
+        async function handleEnterKey(event: KeyboardEvent) {
+            const {key} = event;
             if (key === 'Enter') {
                 if (previousModalJustClosed) {
                     previousModalJustClosed = false;
@@ -320,7 +322,7 @@ export class NoteTitleModal extends SuggestModal<string> {
                 }
                 this.inputEl.value = '';
             }
-        })
+        }
     }
 
     getSuggestions(): string[] {
