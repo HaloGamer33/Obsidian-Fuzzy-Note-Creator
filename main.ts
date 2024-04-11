@@ -1,4 +1,4 @@
-import { Plugin, Notice, App, FuzzySuggestModal, SuggestModal, normalizePath, Instruction } from 'obsidian';
+import { Plugin, Notice, App, FuzzySuggestModal, SuggestModal, normalizePath, Instruction, Platform, TAbstractFile } from 'obsidian';
 import { FuzzyNoteCreatorSettingTab, FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab'
 import { readdirSync } from 'fs'
 
@@ -139,31 +139,15 @@ export class FolderSelectionModal extends FuzzySuggestModal<string> {
     }
 
     getItems(): string[] {
-        function getDirectories(source: string, foundDirs: string[]): string[] {
-            let dirs = readdirSync(source, { withFileTypes: true })
-                .filter(dirent => dirent.isDirectory())
-                .map(dirent => dirent.name);
-            dirs = dirs.filter(directory => !directory.startsWith(`.`));
-            dirs = dirs.map(dir => `${source.slice(path.length)}/${dir}`);
+        let dirs: string[] = [];
 
-            if (dirs.length == 0) {
-                return foundDirs;
+        const abstractFiles = this.app.vault.getAllLoadedFiles() as TAbstractExtended[];
+        for (let i = 0; i < abstractFiles.length; i++) {
+            if (abstractFiles[i].extension === undefined) {
+                dirs.push(abstractFiles[i].path);
             }
-
-            foundDirs = foundDirs.concat(dirs);
-
-            for (let i = 0; i < dirs.length; i++) {
-                foundDirs = getDirectories(`${path}${dirs[i]}`, foundDirs);
-            }
-
-            return foundDirs;
         }
 
-        let dirs: string[] = [];
-        const path = this.app.vault.adapter.basePath;
-        dirs = getDirectories(path, dirs);
-        dirs = dirs.map(dir => dir.slice(1));
-        dirs.push('/');
         return dirs;
     }
 
@@ -175,6 +159,10 @@ export class FolderSelectionModal extends FuzzySuggestModal<string> {
         const normalizedPath = normalizePath(path);
         new NoteTitleModal(this.app, normalizedPath, this.leafMode, this.settings).open();
     }
+}
+
+class TAbstractExtended extends TAbstractFile {
+    extension: string;
 }
 
 export class NoteTitleModal extends SuggestModal<string> {
