@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2024-04-11
+
 ### Added
 
 - Option for non-windows machines to disallow illegal characters to keep compatibility.
-
-### Changed
 
 ## [0.2.0] - 2024-04-08
 
@@ -24,14 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     4. Current window splitting horizontally.
     5. Current window splitting vertically.
 - Bulk version of all commands to create multiple notes in the selected folder.
-- Instructions built into the dialogues, toggable via settings. (on by default)
+- Instructions built into the dialogues, togglable via settings. (on by default)
 - Option to allow or disallow untitled notes. (allowed by default)
 - Option to change the default file extension for notes created via the plugin.
 - Option to change the default name for untitled notes created via the plugin.
 - Use of `/` and `\` for creating folders at filename dialogue.
 - Tab for autocompleting folder names.
-
-### Changed
 
 ## [0.1.0] - 2024-04-07
 
