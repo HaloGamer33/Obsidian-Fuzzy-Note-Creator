@@ -1,5 +1,5 @@
 import FuzzyNoteCreatorPlugin from './main';
-import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
+import { App, PluginSettingTab, Setting, Platform } from 'obsidian';
 
 export interface FuzzyNoteCreatorSettings {
     showInstructions: boolean;
@@ -42,7 +42,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             });
         });
 
-        if (navigator.userAgent.toLowerCase().contains('windows') === false) {
+        if (!Platform.isWin) {
             new Setting(containerEl)
             .setName('Windows note title compatibility')
             .setDesc('When turned on, the plugin won\'t allow you to title notes with Window\'s illegal characters even if you are not on Windows. If running on windows this setting has no effect.')

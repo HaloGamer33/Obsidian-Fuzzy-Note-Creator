@@ -206,7 +206,7 @@ export class NoteTitleModal extends SuggestModal<string> {
             }
 
             const windowsCompatibility: boolean = (
-                navigator.userAgent.toLowerCase().contains('windows') || settings.windowsNoteTitleCompatibility
+                Platform.isWin || settings.windowsNoteTitleCompatibility
             );
 
             if (windowsCompatibility && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
@@ -239,7 +239,7 @@ export class NoteTitleModal extends SuggestModal<string> {
                 noteExtension = DEFAULT_SETTINGS.defaultNoteExtension!;
             }
 
-            if (navigator.userAgent.toLowerCase().contains('windows') && noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null) {
+            if (windowsCompatibility && noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null) {
                 new Notice(`The note extension must not include any of this characters: < > : " \ ? | * /`, 2000);
                 return;
             }
