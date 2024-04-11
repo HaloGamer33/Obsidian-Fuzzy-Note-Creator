@@ -1,6 +1,5 @@
 import { Plugin, Notice, App, FuzzySuggestModal, SuggestModal, normalizePath, Instruction, Platform, TAbstractFile } from 'obsidian';
 import { FuzzyNoteCreatorSettingTab, FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab'
-import { readdirSync } from 'fs'
 
 export default class FuzzyNoteCreatorPlugin extends Plugin {
     settings: FuzzyNoteCreatorSettings;
