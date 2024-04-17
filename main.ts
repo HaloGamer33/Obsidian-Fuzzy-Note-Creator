@@ -1,4 +1,4 @@
-import { Plugin, Notice, App, FuzzySuggestModal, SuggestModal, normalizePath, moment, Instruction, Platform, TAbstractFile } from 'obsidian';
+import { Plugin, Notice, App, FuzzySuggestModal, SuggestModal, normalizePath, moment, Instruction, Platform, TFolder } from 'obsidian';
 import { FuzzyNoteCreatorSettingTab, FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab'
 
 export default class FuzzyNoteCreatorPlugin extends Plugin {
@@ -140,9 +140,9 @@ export class FolderSelectionModal extends FuzzySuggestModal<string> {
     getItems(): string[] {
         let dirs: string[] = [];
 
-        const abstractFiles = this.app.vault.getAllLoadedFiles() as TAbstractExtended[];
+        const abstractFiles = this.app.vault.getAllLoadedFiles();
         for (let i = 0; i < abstractFiles.length; i++) {
-            if (abstractFiles[i].extension === undefined) {
+            if (abstractFiles[i] instanceof TFolder) {
                 dirs.push(abstractFiles[i].path);
             }
         }
@@ -388,8 +388,4 @@ class BooleanWrapper {
     constructor(value: boolean) {
         this.value = value;
     }
-}
-
-class TAbstractExtended extends TAbstractFile {
-    extension: string;
 }
