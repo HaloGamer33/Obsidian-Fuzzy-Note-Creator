@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2024-04-11
 
+### Fixed
+
+- Minor fixes in how the plugin searches for folders in the vault.
+
+## [0.3.0] - 2024-04-11
+
 ### Added
 
 - Templating capabilities for the tittle of the notes.
