@@ -1,5 +1,7 @@
 import { Plugin, Notice, App, FuzzySuggestModal, SuggestModal, normalizePath, moment, Instruction, Platform, TFolder } from 'obsidian';
-import { FuzzyNoteCreatorSettingTab, FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab'
+import { FuzzyNoteCreatorSettingTab, FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab';
+import { AddCommands } from './commands';
+import { OpenNote } from './open-note';
 
 export default class FuzzyNoteCreatorPlugin extends Plugin {
     settings: FuzzyNoteCreatorSettings;
@@ -17,84 +19,7 @@ export default class FuzzyNoteCreatorPlugin extends Plugin {
 
         this.addSettingTab(new FuzzyNoteCreatorSettingTab(this.app, this));
 
-        this.addCommand({
-            id: 'new-tab',
-            name: 'Note in new tab',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'new-tab', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'current-tab',
-            name: 'Note in current tab',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'current-tab', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'new-window',
-            name: 'Note in new window',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'new-window', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'split-horizontal',
-            name: 'Note in current window spliting horizontaly',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'split-horizontal', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'split-vertical',
-            name: 'Note in current window spliting verticaly',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'split-vertical', this.settings).open();
-            },
-        });
-        this.addCommand({
-            id: 'bulk-new-tab',
-            name: 'Bulk note creation in new tabs',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'bulk-new-tab', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'bulk-current-tab',
-            name: 'Bulk note creation in current tab',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'bulk-current-tab', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'bulk-new-window',
-            name: 'Bulk note creation in new windows',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'bulk-new-window', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'bulk-split-horizontal',
-            name: 'Bulk note creation in horizontal splits',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'bulk-split-horizontal', this.settings).open();
-            },
-        });
-
-        this.addCommand({
-            id: 'bulk-split-vertical',
-            name: 'Bulkn note creation in vertical splits',
-            callback: () => {
-                new FolderSelectionModal(this.app, 'bulk-split-vertical', this.settings).open();
-            },
-        });
+        AddCommands.bind(this)();
     }
 }
 
@@ -342,44 +267,7 @@ export class NoteTitleModal extends SuggestModal<string> {
             new Notice(`Created note ${noteName}${noteExtension}, opening it on the system's default application if there is one`, 4000);
         }
 
-        switch (this.leafMode) {
-            case 'new-tab':
-                this.app.workspace.getLeaf('tab').openFile(newNote);
-            this.close();
-            break;
-            case 'current-tab':
-                this.app.workspace.getLeaf(false).openFile(newNote);
-            this.close();
-            break;
-            case 'new-window':
-                this.app.workspace.getLeaf('window').openFile(newNote);
-            this.close();
-            break;
-            case 'split-horizontal':
-                this.app.workspace.getLeaf('split', 'horizontal').openFile(newNote);
-            this.close();
-            break;
-            case 'split-vertical':
-                this.app.workspace.getLeaf('split', 'vertical').openFile(newNote);
-            this.close();
-            break;
-            case 'bulk-new-tab':
-                this.app.workspace.getLeaf('tab').openFile(newNote);
-            break;
-            case 'bulk-current-tab':
-                this.app.workspace.getLeaf(false).openFile(newNote);
-            break;
-            case 'bulk-new-window':
-                this.app.workspace.getLeaf('window').openFile(newNote);
-            break;
-            case 'bulk-split-horizontal':
-                this.app.workspace.getLeaf('split', 'horizontal').openFile(newNote);
-            break;
-            case 'bulk-split-vertical':
-                this.app.workspace.getLeaf('split', 'vertical').openFile(newNote);
-            break;
-        }
-        this.inputEl.value = '';
+        OpenNote.bind(this)(newNote);
     }
 }
 

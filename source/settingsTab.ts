@@ -9,6 +9,8 @@ export interface FuzzyNoteCreatorSettings {
     untitledNoteName: string;
     useNoteTitleTemplates: boolean;
     noteTitleTemplates: string;
+    useNoteTemplates: boolean;
+    noteTemplates: string;
 }
 
 export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
@@ -18,6 +20,7 @@ export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
     defaultNoteExtension: '.md',
     untitledNoteName: 'Untitled',
     useNoteTitleTemplates: false,
+    useNoteTemplates: true,
 };
 
 export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
@@ -138,6 +141,28 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
                 const trimmedValue = value.trim();
 
                 this.plugin.settings.noteTitleTemplates = trimmedValue;
+                await this.plugin.saveSettings();
+            })
+        });
+
+        const noteTemplatesFragment = new DocumentFragment();
+        const noteTemplatesDescription = containerEl.createEl('div', {text: 'Works like the templates native Obsidian plugin.'});
+        const noteTemplatesLink = containerEl.createEl('a', {text: 'Reference for formatting', href: 'https://momentjs.com/docs/#/displaying/format/'});
+
+        noteTemplatesFragment.append(noteTemplatesDescription);
+        noteTemplatesFragment.append(noteTemplatesLink);
+
+        new Setting(containerEl)
+        .setName('Note title noteTemplates')
+        .setDesc(noteTemplatesFragment)
+        .addTextArea((text) => {
+            text
+            .setPlaceholder('YYYY-MM-DD')
+            .setValue(this.plugin.settings.noteTitlenoteTemplates)
+            .onChange(async (value) => {
+                const trimmedValue = value.trim();
+
+                this.plugin.settings.noteTitlenoteTemplates = trimmedValue;
                 await this.plugin.saveSettings();
             })
         });
