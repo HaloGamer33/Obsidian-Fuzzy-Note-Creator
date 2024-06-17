@@ -6,16 +6,12 @@ import { OpenNote } from './open-note';
 export default class FuzzyNoteCreatorPlugin extends Plugin {
     settings: FuzzyNoteCreatorSettings;
 
-    async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-    }
-
     async saveSettings() {
         await this.saveData(this.settings);
     }
 
     async onload() {
-        await this.loadSettings();
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 
         this.addSettingTab(new FuzzyNoteCreatorSettingTab(this.app, this));
 
