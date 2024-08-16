@@ -117,7 +117,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         // │                     Note Templates                      │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', {text: 'Note templates'});
+        containerEl.createEl('h6', {text: 'Note Templates'});
 
         new Setting(containerEl)
         .setName('Use note templates')
@@ -288,7 +288,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         // │                  Note Title Templates                   │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', {text: 'Note title templates'});
+        containerEl.createEl('h6', {text: 'Note Title Templates'});
 
         new Setting(containerEl)
         .setName('Use note title templates')
