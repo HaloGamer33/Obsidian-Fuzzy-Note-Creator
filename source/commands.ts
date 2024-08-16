@@ -1,4 +1,4 @@
-import { FolderSelectionModal } from './main';
+import { FolderSelectionModal } from './folder-selection-modal';
 
 export function AddCommands() {
     this.addCommand({
