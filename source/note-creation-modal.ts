@@ -52,7 +52,7 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         let previousModalJustClosed = new BooleanWrapper(true);
         if (noteTemplate !== undefined) {
             this.inputEl.addEventListener('keyup', event => {
-                this.enterKeyHandler(event, previousModalJustClosed)
+                this.usingTemplatesHandler(event, previousModalJustClosed)
             });
             return;
         }
@@ -98,9 +98,31 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
     getSuggestions(query: string): Suggestion[] {
         let suggestions: Suggestion[] = [];
 
-        if ((!this.settings.useNoteTitleTemplates && !this.settings.useNoteTemplates) || this.noteTemplate !== undefined) {
+        if (!this.settings.useNoteTitleTemplates && !this.settings.useNoteTemplates) {
             this.resultContainerEl.hide();
             return [];
+        }
+
+        if (this.noteTemplate !== undefined) {
+            const noteTitleTemplates = this.settings.noteTitleTemplates.split('\n');
+            const trimmedTemplates = noteTitleTemplates.map(template => template.trim())
+            const filteredTemplates = trimmedTemplates.filter(template => {
+                return template.toLowerCase().includes(query.toLowerCase());
+            });
+
+            const areThereTemplates = filteredTemplates[0] !== "";
+            if (areThereTemplates) {
+                for (let i = 0; i < filteredTemplates.length; i++) {
+                    const currentTemplate = filteredTemplates[i];
+                    const suggestion: Suggestion = {
+                        text: currentTemplate,
+                        type: "TitleTemplate",
+                        query: query.trim(),
+                    }
+                    suggestions.push(suggestion);
+                }
+            }
+            return suggestions;
         }
 
         if (this.settings.useNoteTitleTemplates) {
