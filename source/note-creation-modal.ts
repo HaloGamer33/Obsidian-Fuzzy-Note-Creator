@@ -42,7 +42,8 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
         if (settings.showInstructions) {
             const instructions: Instruction[] = [
-                {command: '↵', purpose: 'to create note'},
+                {command: '↵', purpose: 'to create note/select template'},
+                {command: 'ctrl + ↵', purpose: 'to force create note'},
                 {command: 'esc', purpose: 'to dismiss'},
                 // {command: '/', purpose: 'to create parent folder of the note'},
             ];
@@ -50,6 +51,11 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         }
 
         let previousModalJustClosed = new BooleanWrapper(true);
+        this.inputEl.addEventListener('keydown', event => {
+            if (event.key !== "Enter" && event.ctrlKey !== true) {return;}
+                this.enterKeyHandler(event, previousModalJustClosed);
+        });
+
         if (noteTemplate !== undefined) {
             this.inputEl.addEventListener('keyup', event => {
                 this.usingTemplatesHandler(event, previousModalJustClosed)
