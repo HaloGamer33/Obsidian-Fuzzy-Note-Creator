@@ -27,7 +27,7 @@ export function AddCommands() {
 
     this.addCommand({
         id: 'split-horizontal',
-        name: 'Note in current window spliting horizontaly',
+        name: 'Note in current window spliting horizontally',
         callback: () => {
             new FolderSelectionModal(this.app, 'split-horizontal', this.settings).open();
         },
@@ -35,7 +35,7 @@ export function AddCommands() {
 
     this.addCommand({
         id: 'split-vertical',
-        name: 'Note in current window spliting verticaly',
+        name: 'Note in current window spliting vertically',
         callback: () => {
             new FolderSelectionModal(this.app, 'split-vertical', this.settings).open();
         },

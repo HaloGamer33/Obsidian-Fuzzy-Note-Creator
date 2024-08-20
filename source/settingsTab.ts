@@ -1,28 +1,33 @@
 import FuzzyNoteCreatorPlugin from './main';
 import { App, PluginSettingTab, Setting, Platform, moment } from 'obsidian';
+import { OverrideNewNote, RestoreNewNote } from './override-new-note';
 
 export interface FuzzyNoteCreatorSettings {
-    showInstructions: boolean;
+    showInstructions:              boolean;
     windowsNoteTitleCompatibility: boolean,
-    allowUntitledNotes: boolean;
-    defaultNoteExtension: string;
-    untitledNoteName: string;
-    useNoteTitleTemplates: boolean;
-    noteTitleTemplates: string;
-    useNoteTemplates: boolean;
-    noteTemplatesFolder: string;
-    dateFormat: string;
-    timeFormat: string;
+    allowUntitledNotes:            boolean;
+    defaultNoteExtension:          string;
+    untitledNoteName:              string;
+    useNoteTitleTemplates:         boolean;
+    noteTitleTemplates:            string;
+    useNoteTemplates:              boolean;
+    noteTemplatesFolder:           string;
+    dateFormat:                    string;
+    timeFormat:                    string;
+    overrideNewNote:               boolean;
+    overrideCommand:               string;
 }
 
 export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
-    showInstructions: true,
+    showInstructions:              true,
     windowsNoteTitleCompatibility: false,
-    allowUntitledNotes: true,
-    defaultNoteExtension: '.md',
-    untitledNoteName: 'Untitled',
-    useNoteTitleTemplates: false,
-    useNoteTemplates: true,
+    allowUntitledNotes:            true,
+    defaultNoteExtension:          '.md',
+    untitledNoteName:              'Untitled',
+    useNoteTitleTemplates:         false,
+    useNoteTemplates:              false,
+    overrideNewNote:               false,
+    overrideCommand:               "new-note",
 };
 
 export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
@@ -39,6 +44,10 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         let { containerEl } = this;
 
         containerEl.empty();
+
+        // ╭─────────────────────────────────────────────────────────╮
+        // │                    General Settings                     │
+        // ╰─────────────────────────────────────────────────────────╯
 
         new Setting(containerEl)
         .setName('Show instructions')
@@ -78,6 +87,10 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
             })
         });
+
+        // ╭─────────────────────────────────────────────────────────╮
+        // │                     Untitled Notes                      │
+        // ╰─────────────────────────────────────────────────────────╯
 
         containerEl.createEl('h6', { text: 'Untitled Notes'});
 
@@ -330,6 +343,54 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             });
             text.inputEl.setCssStyles({resize: "none"})
         });
+
+        // ╭─────────────────────────────────────────────────────────╮
+        // │                Override New Note Button                 │
+        // ╰─────────────────────────────────────────────────────────╯
+
+        containerEl.createEl('h6', {text: 'Note Title Templates'});
+
+        new Setting(containerEl)
+        .setName(`Override Obsidian's new note button`)
+        .setDesc(`When this option is turned on, the 'New Note' button located on top of the file explorer will function as a shortcut to the command that is defined on the 'Override command'.`)
+        .addToggle((slider) => {
+            slider
+            .setValue(this.plugin.settings.overrideNewNote)
+            .onChange(async (value: boolean) => {
+                this.plugin.settings.overrideNewNote = value;
+                await this.plugin.saveSettings();
+
+                if (value === true) {
+                    OverrideNewNote.bind(this.plugin)();
+                } else {
+                    RestoreNewNote.bind(this.plugin)();
+                }
+            });
+        });
+
+        new Setting(containerEl)
+        .setName(`Override command`)
+        .setDesc(`The command that will be called when you click Obsidian's 'New note' button.`)
+        .addDropdown((dropdown) => {
+            dropdown
+            .addOptions({
+                "new-tab":               "New Tab",
+                "current-tab":           "Current Tab",
+                "new-window":            "New Window",
+                "split-horizontal":      "Current Window: spliting horizontally",
+                "split-vertical":        "Current Window: spliting vertically",
+                "bulk-new-tab":          "Bulk note creation: New Tab",
+                "bulk-current-tab":      "Bulk note creation: Current Tab",
+                "bulk-new-window":       "Bulk note creation: New Window",
+                "bulk-split-horizontal": "Bulk note creation: horizontal splits",
+                "bulk-split-vertical":   "Bulk note creation: vertical splits",
+            })
+            .setValue(this.plugin.settings.overrideCommand)
+            .onChange(async (value: string) => {
+                // console.log(value);
+                this.plugin.settings.overrideCommand = value;
+                await this.plugin.saveSettings();
+            });
+        });
     }
 }
-
