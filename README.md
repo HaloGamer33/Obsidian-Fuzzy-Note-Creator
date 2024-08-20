@@ -121,6 +121,17 @@ you create a new note, this title template will be suggested to you, the note wi
 
 There are plans to pair this functionality with the normal templates, so that way you can use a title template and a normal template at the same time. Stay tuned for that.
 
+### Override New Note Button
+
+#### 1. **Override Obsidian's new note button**
+
+This slider activates the override for the native 'New note' button that is located on top of the file explorer, when active the normal functionality will be replaced for the one
+defined at the setting 'Override command'.
+
+#### 2. **Override command**
+
+This dropdown menu selects the command that will be called when the override for the 'New note' button is active, if none is set the default command is 'New tab'.
+
 # Contributing
 
 If you encounter any issues or have suggestions for improvements, please feel free to open an issue on the GitHub repository.
