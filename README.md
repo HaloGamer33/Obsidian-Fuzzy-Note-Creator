@@ -4,6 +4,8 @@ This Obsidian plugin allows users to quickly create new notes using a fuzzy sear
 
 # Usage
 
+https://github.com/user-attachments/assets/fc866ea6-fd51-4d87-b868-01154af9843d
+
 ## Opening Fuzzy Note Creator
 
 1. Press Ctrl + P (Cmd + P on macOS) to open the command palette.
