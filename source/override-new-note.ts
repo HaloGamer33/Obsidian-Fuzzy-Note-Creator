@@ -43,6 +43,10 @@ export async function OverrideNewNote() {
 }
 
 export async function RestoreNewNote() {
+    if (originalButton === undefined) {
+        return;
+    }
+
     await waitForElement('[aria-label="New note"]')
 
     const modifiedButton = document.querySelector('[aria-label="New note"]');

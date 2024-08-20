@@ -1,7 +1,7 @@
 import { Plugin } from 'obsidian';
 import { FuzzyNoteCreatorSettingTab, FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab';
 import { AddCommands } from './commands';
-import { OverrideNewNote } from './override-new-note';
+import { OverrideNewNote, RestoreNewNote } from './override-new-note';
 
 export default class FuzzyNoteCreatorPlugin extends Plugin {
     settings: FuzzyNoteCreatorSettings;
@@ -22,5 +22,9 @@ export default class FuzzyNoteCreatorPlugin extends Plugin {
         if (this.settings.overrideNewNote) {
             OverrideNewNote.bind(this)();
         }
+    }
+
+    async onunload() {
+        RestoreNewNote.bind(this)();
     }
 }
