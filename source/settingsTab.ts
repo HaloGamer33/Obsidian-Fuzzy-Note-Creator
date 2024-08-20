@@ -348,7 +348,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         // │                Override New Note Button                 │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', {text: 'Note Title Templates'});
+        containerEl.createEl('h6', {text: 'Override New Note Button'});
 
         new Setting(containerEl)
         .setName(`Override Obsidian's new note button`)
