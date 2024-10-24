@@ -2,8 +2,13 @@ import { App, FuzzySuggestModal, normalizePath, Instruction, TFolder } from 'obs
 import { FuzzyNoteCreatorSettings } from './settingsTab';
 import { NoteCreationModal } from './note-creation-modal';
 
+interface Suggestion {
+    displayText: string
+    path:        string
+}
+
 // Modals are elements in the UI that require interaction from the user
-export class FolderSelectionModal extends FuzzySuggestModal<string> {
+export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
     settings: FuzzyNoteCreatorSettings;
     leafMode: string;
 
@@ -46,26 +51,50 @@ export class FolderSelectionModal extends FuzzySuggestModal<string> {
     // ── End of constructor ──────────────────────────────────────────────
 
     // Get the folders in the vault
-    getItems(): string[] {
-        let dirs: string[] = [];
+    getItems(): Suggestion[] {
+        let dirs: Suggestion[] = [];
 
         const abstractFiles = this.app.vault.getAllLoadedFiles();
         for (let i = 0; i < abstractFiles.length; i++) {
             if (abstractFiles[i] instanceof TFolder) {
-                dirs.push(abstractFiles[i].path);
+                dirs.push({
+                    displayText: abstractFiles[i].path,
+                    path:        abstractFiles[i].path,
+                });
+            }
+        }
+
+        if (this.settings.currentFolderRecommendation || this.settings.currentFolderFirst) {
+            const activeFile = this.app.workspace.getActiveFile();
+            if (!activeFile) { return dirs }
+
+            const currentPath = activeFile.path;
+
+            if (this.settings.currentFolderRecommendation) {
+                dirs.unshift({
+                    displayText: this.settings.currentFolderRecommendationName,
+                    path: currentPath,
+                });
+            }
+
+            if (this.settings.currentFolderFirst) {
+                dirs.unshift({
+                    displayText: currentPath,
+                    path: currentPath,
+                })
             }
         }
 
         return dirs;
     }
 
-    getItemText(path: string): string {
-        return path;
+    getItemText(suggestion: Suggestion): string {
+        return suggestion.displayText;
     }
 
-    onChooseItem(path: string) {
+    onChooseItem(suggestion: Suggestion) {
         // normalizePath is an obsidian function (I still do some work to normalize the path down the line)
-        const normalizedPath = normalizePath(path);
+        const normalizedPath = normalizePath(suggestion.path);
         new NoteCreationModal(this.app, normalizedPath, this.leafMode, this.settings).open();
     }
 }

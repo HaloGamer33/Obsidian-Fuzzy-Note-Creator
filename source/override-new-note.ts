@@ -36,6 +36,7 @@ export async function OverrideNewNote() {
     if (newNoteButton) {
         const modifiedButton = newNoteButton.cloneNode(true);
         newNoteButton.parentNode!.replaceChild(modifiedButton, newNoteButton);
+
         modifiedButton.addEventListener('click', () => {
             new FolderSelectionModal(this.app, this.settings.overrideCommand, this.settings).open();
         });

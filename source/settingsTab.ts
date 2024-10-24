@@ -3,19 +3,22 @@ import { App, PluginSettingTab, Setting, Platform, moment } from 'obsidian';
 import { OverrideNewNote, RestoreNewNote } from './override-new-note';
 
 export interface FuzzyNoteCreatorSettings {
-    showInstructions:              boolean;
-    windowsNoteTitleCompatibility: boolean,
-    allowUntitledNotes:            boolean;
-    defaultNoteExtension:          string;
-    untitledNoteName:              string;
-    useNoteTitleTemplates:         boolean;
-    noteTitleTemplates:            string;
-    useNoteTemplates:              boolean;
-    noteTemplatesFolder:           string;
-    dateFormat:                    string;
-    timeFormat:                    string;
-    overrideNewNote:               boolean;
-    overrideCommand:               string;
+    showInstructions:                boolean;
+    windowsNoteTitleCompatibility:   boolean,
+    allowUntitledNotes:              boolean;
+    defaultNoteExtension:            string;
+    untitledNoteName:                string;
+    useNoteTitleTemplates:           boolean;
+    noteTitleTemplates:              string;
+    useNoteTemplates:                boolean;
+    noteTemplatesFolder:             string;
+    dateFormat:                      string;
+    timeFormat:                      string;
+    overrideNewNote:                 boolean;
+    overrideCommand:                 string;
+    currentFolderFirst:              boolean;
+    currentFolderRecommendation:     boolean;
+    currentFolderRecommendationName: string;
 }
 
 export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
@@ -27,7 +30,10 @@ export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
     useNoteTitleTemplates:         false,
     useNoteTemplates:              false,
     overrideNewNote:               false,
-    overrideCommand:               "new-note",
+    overrideCommand:               'new-note',
+    currentFolderFirst:            true,
+    currentFolderRecommendation:   false,
+    currentFolderRecommendationName: 'Current Folder',
 };
 
 export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
@@ -84,6 +90,55 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             .setValue(this.plugin.settings.defaultNoteExtension)
             .onChange(async (value) => {
                 this.plugin.settings.defaultNoteExtension = value.trim();
+                await this.plugin.saveSettings();
+            })
+        });
+
+        // ╭─────────────────────────────────────────────────────────╮
+        // │                 Current Folder Settings                 │
+        // ╰─────────────────────────────────────────────────────────╯
+
+        containerEl.createEl('h6', { text: 'Current Folder Recommendations'});
+
+        new Setting(containerEl)
+        .setName('Current Folder First')
+        .setDesc('When creating a new note, and you have not written anything into the text box, the first folder recommendation will be your current folder.')
+        .addToggle((slider) => {
+            slider
+            .setValue(this.plugin.settings.currentFolderFirst)
+            .onChange(async (value: boolean) => {
+                this.plugin.settings.currentFolderFirst = value;
+                await this.plugin.saveSettings();
+            });
+        });
+
+        new Setting(containerEl)
+        .setName('Current Folder Recommendation')
+        .setDesc('When turned on, a Recommendation named "Current Folder" will be available on the folder selection, you can change the name of the recommendation on the next setting.')
+        .addToggle((slider) => {
+            slider
+            .setValue(this.plugin.settings.currentFolderRecommendation)
+            .onChange(async (value: boolean) => {
+                this.plugin.settings.currentFolderRecommendation = value;
+                await this.plugin.saveSettings();
+            });
+        });
+
+        new Setting(containerEl)
+        .setName('Current Folder Recommendation Name')
+        .setDesc('The name of the "Current Folder" recomendation on the folder selection.')
+        .addText((text) => {
+            text
+            .setPlaceholder('Current Folder')
+            .setValue(this.plugin.settings.currentFolderRecommendationName)
+            .onChange(async (value) => {
+                let trimmedValue = value.trim();
+                if (trimmedValue == '') {
+                    this.plugin.settings.currentFolderRecommendationName = DEFAULT_SETTINGS.currentFolderRecommendationName!;
+                    await this.plugin.saveSettings();
+                    return;
+                }
+                this.plugin.settings.currentFolderRecommendationName = trimmedValue;
                 await this.plugin.saveSettings();
             })
         });
@@ -387,7 +442,6 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             })
             .setValue(this.plugin.settings.overrideCommand)
             .onChange(async (value: string) => {
-                // console.log(value);
                 this.plugin.settings.overrideCommand = value;
                 await this.plugin.saveSettings();
             });

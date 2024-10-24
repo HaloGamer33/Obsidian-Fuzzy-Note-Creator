@@ -177,32 +177,20 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
                 const queryWrappers: queryWrapper[] = query.trim().split(" ").map((query) => {return {query: query, found: false}});
                 const pathElements = notePath.split(" ");
-                // console.log(`\n\n\n-------------------\nNEW CYCLE`);
-                // console.log(`Working with the note:\n\n${notePath}\n`);
                 for (let p = 0; p < pathElements.length; p++) {
                     let headIndex: number = 0;
-                    // console.log(`NEW CYCLE`);
                     for (let q = 0; q < queryWrappers.length; q++) {
-                        // console.log(`current path element:`, pathElements[p]);
-                        // console.log(`current query element:`, queryWrappers[q].query);
                         if (queryWrappers[q].found === true) {
-                            // console.log("Already found, continuing");
-                            // console.log(`\n`);
                             continue;
                         }
 
                         const indexOfQuery = pathElements[p].toLowerCase().indexOf(queryWrappers[q].query.toLowerCase(), headIndex);
                         if (indexOfQuery === -1) {
-                            // console.log(`'${queryWrappers[q].query}' not found on '${pathElements[p].slice(headIndex)}', breaking.`);
-                            // console.log(`\n`);
                             break;
                         }
-                        // console.log(`'${queryWrappers[q].query}' found on '${pathElements[p].slice(headIndex)}'`);
 
                         headIndex = indexOfQuery + queryWrappers[q].query.length;
                         queryWrappers[q].found = true;
-                        // console.log(`current wrapper:`, queryWrappers[q]);
-                        // console.log(`\n`);
                     }
 
                     let allFound = true;
@@ -212,7 +200,6 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
                     if (allFound === true) {
                         noteTemplatesFilePaths.push(notePath);
-                        // console.log(`All components have been found, breaking.`);
                         break;
                     }
                 }
