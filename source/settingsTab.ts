@@ -101,7 +101,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         containerEl.createEl('h6', { text: 'Current Folder Recommendations'});
 
         new Setting(containerEl)
-        .setName('Current Folder First')
+        .setName('Current folder first')
         .setDesc('When creating a new note, and you have not written anything into the text box, the first folder recommendation will be your current folder.')
         .addToggle((slider) => {
             slider
@@ -113,7 +113,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         });
 
         new Setting(containerEl)
-        .setName('Current Folder Recommendation')
+        .setName('Current folder recommendation')
         .setDesc('When turned on, a Recommendation named "Current Folder" will be available on the folder selection, you can change the name of the recommendation on the next setting.')
         .addToggle((slider) => {
             slider
@@ -125,7 +125,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         });
 
         new Setting(containerEl)
-        .setName('Current Folder Recommendation Name')
+        .setName('Current folder recommendation name')
         .setDesc('The name of the "Current Folder" recomendation on the folder selection.')
         .addText((text) => {
             text
