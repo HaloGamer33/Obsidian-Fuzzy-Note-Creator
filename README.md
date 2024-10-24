@@ -73,6 +73,24 @@ Setting turned off
 When creating any note with the plugin, the file extension that you define on this setting will be appended to the end of the note title that you provide. If you set anything other
 than `.md` (Markdown) then Obsidian will try to open the file in system's the default application after it has been created. If left empty, it will default to `.md`.
 
+### Current Folder Recommendations
+
+#### 1. **Current folder first**
+
+When this setting is active, the plugin looks at your current active note, and then gives you the
+folder where that note is located as your first recommendation.
+
+#### 2. **Current folder recommendation**
+
+This setting makes it, so the plugin adds a recommendation named (by default) "Current Folder", this
+works as you'd expect, when you select this as your folder, the current folder from your currently
+active note will be used for the new note. This setting exists to mimic the way that other plugins
+handle similar behavior, so people that are already used to a certain name for the "Current Folder"
+concept don't have to re-adapt to my plugin.
+
+#### 3. **Current folder recommendation name**
+
+This is the name for your "Current Folder" recommendation.
 
 ### Untitled Notes
 
