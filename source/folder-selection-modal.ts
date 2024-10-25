@@ -68,7 +68,7 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
             const activeFile = this.app.workspace.getActiveFile();
             if (!activeFile) { return dirs }
 
-            const currentPath = activeFile.path;
+            const currentPath = activeFile.parent!.path;
 
             if (this.settings.currentFolderRecommendation) {
                 dirs.unshift({
