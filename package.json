@@ -1,6 +1,6 @@
 {
 	"name": "fuzzy-note-creator",
-	"version": "0.6.1",
+	"version": "0.6.2",
 	"description": "Create notes in specific folders with the help of a fuzzy finder",
 	"main": "main.js",
 	"scripts": {
