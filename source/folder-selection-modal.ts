@@ -1,4 +1,4 @@
-import { App, FuzzySuggestModal, normalizePath, Instruction, TFolder } from 'obsidian';
+import { App, FuzzySuggestModal, normalizePath, Instruction, TFolder, Platform, Notice } from 'obsidian';
 import { FuzzyNoteCreatorSettings } from './settingsTab';
 import { NoteCreationModal } from './note-creation-modal';
 
@@ -11,6 +11,8 @@ interface Suggestion {
 export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
     settings: FuzzyNoteCreatorSettings;
     leafMode: string;
+    dirs: Suggestion[];
+    newDirSuggestion: Suggestion;
 
     constructor(app: App, leafMode: string, settings: FuzzyNoteCreatorSettings) {
         super(app)
@@ -41,7 +43,12 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
                         continue;
                     }
 
-                    this.inputEl.value = suggestions[i].getText();
+                    this.inputEl.value = suggestions[i].getText().replace(' Press ↵ to create folder.', '');
+
+                    // Trigger an input event to update suggestions
+                    const event = new Event('input', { bubbles: true, cancelable: true });
+                    this.inputEl.dispatchEvent(event);
+
                     break;
                 }
             }
@@ -85,6 +92,7 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
             }
         }
 
+        this.dirs = dirs;
         return dirs;
     }
 
@@ -94,7 +102,67 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
 
     onChooseItem(suggestion: Suggestion) {
         // normalizePath is an obsidian function (I still do some work to normalize the path down the line)
+        if (this.newDirSuggestion) {
+            let path = normalizePath(this.newDirSuggestion.path);
+            const windowsCompatibility: boolean = (
+                Platform.isWin || this.settings.windowsNoteTitleCompatibility
+            );
+
+            path = path.replace('\\', '/')
+            let pathArray = path.split('/').map(link => link.trim()).filter(link => link.length !== 0);
+            path = pathArray.join('/');
+
+            if (windowsCompatibility && path.match(/(<|>|:|"|\||\?|\*)/) !== null) {
+                new Notice(`The note title must not include any of this characters: < > : " ? | *`, 2000);
+                new FolderSelectionModal(this.app, this.leafMode, this.settings).open();
+                return;
+            }
+
+            new NoteCreationModal(this.app, path, this.leafMode, this.settings).open();
+            return;
+        }
+
         const normalizedPath = normalizePath(suggestion.path);
         new NoteCreationModal(this.app, normalizedPath, this.leafMode, this.settings).open();
+    }
+
+    onNoSuggestion() {
+        this.resultContainerEl.replaceChildren();
+        const input = this.inputEl.value; 
+        const dirs = this.dirs.filter(dir => {
+            if (dir.path != '/') {
+                dir.path += '/';
+            }
+            return dir;
+        })
+
+        const existingDirs = dirs.filter(dir => {
+            if (input.startsWith(dir.path)) {
+                return true;
+            }
+        })
+
+        let longestDir = '';
+        for (let i = 0; i < existingDirs.length; i++) {
+            if (existingDirs[i].path.length > longestDir.length) {
+                longestDir = existingDirs[i].path;
+            }
+        }
+      
+        const newDir = input.replace(longestDir, '');
+        const existingDir = longestDir;
+
+        const newDirSuggestion = this.resultContainerEl.createDiv({cls: ['suggestion-item', 'is-selected']});
+
+        newDirSuggestion.createEl('span', {text: existingDir});
+        newDirSuggestion.createEl('span', {cls: 'suggestion-highlight', text: newDir});
+        newDirSuggestion.createEl('kbd', {text: ' Press ↵ to create folder.'});
+
+        this.newDirSuggestion = {
+            displayText: `${existingDir}${newDir}`,
+            path: `${existingDir}${newDir}`
+        }
+
+        // console.log(this.newDirSuggestion);
     }
 }

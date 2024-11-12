@@ -52,52 +52,23 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
         let previousModalJustClosed = new BooleanWrapper(true);
         this.inputEl.addEventListener('keydown', event => {
-            if (event.key !== "Enter" && event.ctrlKey !== true) {return;}
-                this.enterKeyHandler(event, previousModalJustClosed);
+            if (event.key == "Enter" && event.ctrlKey == true) {
+                this.createNote(event, previousModalJustClosed);
+            }
         });
-
-        if (noteTemplate !== undefined) {
-            this.inputEl.addEventListener('keyup', event => {
-                this.usingTemplatesHandler(event, previousModalJustClosed)
-            });
-            return;
-        }
 
         if (!settings.useNoteTitleTemplates) {
             this.inputEl.addEventListener('keyup', event => {
-                this.enterKeyHandler(event, previousModalJustClosed)
+                this.createNote(event, previousModalJustClosed)
             });
             return;
         }
 
-        if (settings.useNoteTitleTemplates) {
+        if (settings.useNoteTitleTemplates || noteTemplate !== undefined) {
             this.inputEl.addEventListener('keyup', event => {
-                this.usingTemplatesHandler(event, previousModalJustClosed)
+                this.emptySuggestionsCatcher(event, previousModalJustClosed)
             });
             return;
-        }
-    }
-
-    async usingTemplatesHandler(event: KeyboardEvent | MouseEvent, previousModalJustClosed: BooleanWrapper) {
-        const isKeyboardEvent = (event: KeyboardEvent | MouseEvent): event is KeyboardEvent => "key" in event;
-
-        if(isKeyboardEvent(event)) {
-            const {key} = event;
-            if (key !== 'Enter') { 
-                return 
-            }
-        }
-
-        if (previousModalJustClosed.value) {
-            previousModalJustClosed.value = false;
-            return;
-        }
-
-        /* This only triggers if the user pressed 'enter' when no suggestion was displayed,
-         * aka: doesn't want to use any template and wants to create a blank note. Otherwise
-         * the program goes to the function 'OnChooseSuggestion' */
-        if (this.getSuggestions(this.inputEl.value).length === 0) {
-            this.enterKeyHandler(event, previousModalJustClosed)
         }
     }
 
@@ -252,7 +223,7 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
     onChooseSuggestion(suggestion: Suggestion, evt: MouseEvent | KeyboardEvent) {
         if (suggestion.type === "TitleTemplate") {
             const formatedNoteTitle = moment().format(suggestion.text)
-            this.enterKeyHandler(evt, new BooleanWrapper(false), formatedNoteTitle)
+            this.createNote(evt, new BooleanWrapper(false), formatedNoteTitle)
         }
 
         if (suggestion.type === "NoteTemplate") {
@@ -261,7 +232,13 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         }
     }
 
-    async enterKeyHandler(event: KeyboardEvent | MouseEvent, previousModalJustClosed: BooleanWrapper, noteName?: string) {
+    // ╭─────────────────────────────────────────────────────────╮
+    // │                   Call Back Functions                   │
+    // ╰─────────────────────────────────────────────────────────╯
+
+    //  ── Create Note Call Back ───────────────────────────────────────────
+
+    async createNote(event: KeyboardEvent | MouseEvent, previousModalJustClosed: BooleanWrapper, noteName?: string) {
         const isKeyboardEvent = (event: KeyboardEvent | MouseEvent): event is KeyboardEvent => "key" in event;
 
         if(isKeyboardEvent(event)) {
@@ -303,6 +280,10 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         if (noteName.match(/^[\\\/\s]+$/)) {
             new Notice(`The note title must not be only '\\' or '/'`);
             return;
+        }
+
+        if (this.app.vault.getFolderByPath(this.path) === null) {
+            this.app.vault.createFolder(this.path);
         }
 
         if (noteName.match(/(\/|\\)/) !== null) {
@@ -412,5 +393,30 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         }
 
         OpenNote.bind(this)(newNote);
+    }
+
+    //  ── Empty Suggestions Catcher ───────────────────────────────────────
+
+    async emptySuggestionsCatcher(event: KeyboardEvent | MouseEvent, previousModalJustClosed: BooleanWrapper) {
+        const isKeyboardEvent = (event: KeyboardEvent | MouseEvent): event is KeyboardEvent => "key" in event;
+
+        if(isKeyboardEvent(event)) {
+            const {key} = event;
+            if (key !== 'Enter') { 
+                return 
+            }
+        }
+
+        if (previousModalJustClosed.value) {
+            previousModalJustClosed.value = false;
+            return;
+        }
+
+        /* This only triggers if the user pressed 'enter' when no suggestion was displayed,
+        * aka: doesn't want to use any template and wants to create a blank note. Otherwise
+        * the program goes to the function 'OnChooseSuggestion' */
+        if (this.getSuggestions(this.inputEl.value).length === 0) {
+            this.createNote(event, previousModalJustClosed)
+        }
     }
 }
