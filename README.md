@@ -1,3 +1,7 @@
+[![Obsidian](https://img.shields.io/badge/Obsidian-Plugin-%237C3AED?style=flat-square&logo=obsidian)](https://obsidian.md)
+[![GitHub Release](https://img.shields.io/github/v/release/HaloGamer33/Obsidian-Fuzzy-Note-Creator?sort=semver&display_name=release&style=flat-square&label=Version&color=48b235)](https://github.com/HaloGamer33/Obsidian-Fuzzy-Note-Creator/releases/latest)
+[![Made By](https://img.shields.io/badge/Made%20By-HaloGamer33-white?style=flat-square&label=Made%20by%20&color=%23e12a56)](https://github.com/HaloGamer33)
+
 # Obsidian Fuzzy Note Creator
 
 This Obsidian plugin allows users to quickly create new notes using a fuzzy search interface for selecting the destination folder and providing the note title.
