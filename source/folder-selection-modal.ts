@@ -12,7 +12,7 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
     settings: FuzzyNoteCreatorSettings;
     leafMode: string;
     dirs: Suggestion[];
-    newDirSuggestion: Suggestion;
+    newDirSuggestion: Suggestion | null;
 
     constructor(app: App, leafMode: string, settings: FuzzyNoteCreatorSettings) {
         super(app)
@@ -97,6 +97,8 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
     }
 
     getItemText(suggestion: Suggestion): string {
+        this.newDirSuggestion = null;
+
         return suggestion.displayText;
     }
 
