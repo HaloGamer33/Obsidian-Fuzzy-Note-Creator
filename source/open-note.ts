@@ -1,4 +1,4 @@
-import { TFile } from 'Obsidian';
+import { TFile } from 'obsidian';
 
 export function OpenNote(newNote: TFile) {
     switch (this.leafMode) {
