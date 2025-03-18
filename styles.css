@@ -1,25 +1,25 @@
-.suggestion {
+.FZ-FolderSetting .suggestion {
     position: relative;
     display: inline-block;
     overflow-y: visible;
 }
 
-.input-search {
+.FZ-FolderSetting .input-search {
     /* border: 1px solid #FFFFFF; */
     position: relative;
     /* display: none; */
 }
 
 
-.dropdown-menu {
+.FZ-FolderSetting .dropdown-menu {
     position: absolute;
     z-index: 1;
 
     /*position the autocomplete items to be the same width as the container:*/
 
-    top: 100%;
-    left: 0;
-    right: 0;
+    /* top: 100%; */
+    /* left: 0; */
+    right: 5px;
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-m);
@@ -29,18 +29,18 @@
     text-align: start;
 }
 
-.dropdown-menu div {
+.FZ-FolderSetting .dropdown-menu div {
     border-radius: var(--radius-s);
     padding: var(--size-2-3) var(--size-4-3);
     padding-inline-start: 12px;
 }
 
-.dropdown-menu div:hover {
+.FZ-FolderSetting .dropdown-menu div:hover {
     background-color: var(--background-modifier-hover);
     border-radius: var(--radius-s);
 }
 
-.autocomplete-active {
+.FZ-FolderSetting .autocomplete-active {
     /*when navigating through the items using the arrow keys:*/
     /* background-color: DodgerBlue !important; */
     /* color: #ffffff; */

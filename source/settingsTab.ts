@@ -205,6 +205,8 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         .setName("Template folder location")
         .setDesc("Files in this folder will be available as templates.");
 
+        folderLocationSetting.settingEl.classList.add('FZ-FolderSetting');
+
         const suggestionDiv      = folderLocationSetting.settingEl.querySelector(".setting-item-control")!.createEl("div", { cls: "suggestion" });
         const folderInput        = suggestionDiv.createEl("input", { attr: { id: "textbox-folder", type: "text" }});
         const templateFolderPath = this.plugin.settings.noteTemplatesFolder;
