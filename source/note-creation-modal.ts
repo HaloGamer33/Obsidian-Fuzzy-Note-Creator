@@ -75,12 +75,14 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
     getSuggestions(query: string): Suggestion[] {
         let suggestions: Suggestion[] = [];
 
-        if (!this.settings.useNoteTitleTemplates && !this.settings.useNoteTemplates) {
+        const noTemplatesEnabled = !this.settings.useNoteTitleTemplates && !this.settings.useNoteTemplates;
+        if (noTemplatesEnabled) {
             this.resultContainerEl.hide();
             return [];
         }
 
-        if (this.noteTemplate !== undefined) {
+        const hasNoteTemplate = this.noteTemplate !== undefined;
+        if (hasNoteTemplate) {
             const noteTitleTemplates = this.settings.noteTitleTemplates.split('\n');
             const trimmedTemplates = noteTitleTemplates.map(template => template.trim())
             const filteredTemplates = trimmedTemplates.filter(template => {
@@ -190,8 +192,16 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
     }
 
     renderSuggestion(suggestion: Suggestion, el: HTMLElement) {
-        if (suggestion.query === "") {
-            el.createEl("div", {text: suggestion.text});
+        if (suggestion.query === '') {
+            switch (suggestion.type) {
+                //TODO: Add bold to the text that shows which type of template it is
+                case 'TitleTemplate':
+                    el.createEl("div", {text: `/BOLDNote Title Template/BOLD: ${suggestion.text}`});
+                    break;
+                case 'NoteTemplate':
+                    el.createEl('div', {text: `/BOLDNote Template/BOLD: ${suggestion.text}`});
+                    break;
+            }
         }
 
         function escapeRegExp(str: string): string {
@@ -248,6 +258,9 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             }
         }
 
+        // Check to see if the previous menu has just closed, to prevent
+        // a ghost enter that creates a untitled note.
+        
         if (previousModalJustClosed.value) {
             previousModalJustClosed.value = false;
             return;
@@ -338,45 +351,45 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             const noteTemplatePath = this.noteTemplate.path;
             const templateFile = this.app.vault.getFileByPath(noteTemplatePath);
 
-            if (templateFile !== null) {
-                noteContents = await this.app.vault.read(templateFile);
+            if (templateFile == null) { return; }
 
-                const timeFormat = this.settings.timeFormat;
-                const dateFormat = this.settings.dateFormat;
+            noteContents = await this.app.vault.read(templateFile);
 
-                const validTimeFormat = (timeFormat === undefined || timeFormat === "") ? "HH:mm" : timeFormat;
-                const validDateFormat = (dateFormat === undefined || dateFormat === "") ? "YYYY-MM-DD" : dateFormat;
+            const timeFormat = this.settings.timeFormat;
+            const dateFormat = this.settings.dateFormat;
 
-                const formatedTime = moment().format(validTimeFormat);
-                const formatedDate = moment().format(validDateFormat);
+            const validTimeFormat = (timeFormat === undefined || timeFormat === "") ? "HH:mm" : timeFormat;
+            const validDateFormat = (dateFormat === undefined || dateFormat === "") ? "YYYY-MM-DD" : dateFormat;
 
-                noteContents = noteContents.replace(/{{time}}/g, formatedTime);
-                noteContents = noteContents.replace(/{{date}}/g, formatedDate);
+            const formatedTime = moment().format(validTimeFormat);
+            const formatedDate = moment().format(validDateFormat);
 
-                const overrideDateRegex = new RegExp(String.raw`{{date:(.+)}}`, "g");
-                const overrideTimeRegex = new RegExp(String.raw`{{time:(.+)}}`, "g");
+            noteContents = noteContents.replace(/{{time}}/g, formatedTime);
+            noteContents = noteContents.replace(/{{date}}/g, formatedDate);
 
-                const matchesDate = noteContents.matchAll(overrideDateRegex);
-                const matchesTime = noteContents.matchAll(overrideTimeRegex);
+            const overrideDateRegex = new RegExp(String.raw`{{date:(.+)}}`, "g");
+            const overrideTimeRegex = new RegExp(String.raw`{{time:(.+)}}`, "g");
 
-                if (matchesDate !== null) {
-                    const matchesArray = [...matchesDate];
-                    for (let i = 0; i < matchesArray.length; i++) {
-                        const override = matchesArray[i][0];
-                        const format = matchesArray[i][1];
+            const matchesDate = noteContents.matchAll(overrideDateRegex);
+            const matchesTime = noteContents.matchAll(overrideTimeRegex);
 
-                        noteContents = noteContents.replace(override, moment().format(format));
-                    }
+            if (matchesDate !== null) {
+                const matchesArray = [...matchesDate];
+                for (let i = 0; i < matchesArray.length; i++) {
+                    const override = matchesArray[i][0];
+                    const format = matchesArray[i][1];
+
+                    noteContents = noteContents.replace(override, moment().format(format));
                 }
+            }
 
-                if (matchesTime !== null) {
-                    const matchesArray = [...matchesTime];
-                    for (let i = 0; i < matchesArray.length; i++) {
-                        const override = matchesArray[i][0];
-                        const format = matchesArray[i][1];
+            if (matchesTime !== null) {
+                const matchesArray = [...matchesTime];
+                for (let i = 0; i < matchesArray.length; i++) {
+                    const override = matchesArray[i][0];
+                    const format = matchesArray[i][1];
 
-                        noteContents = noteContents.replace(override, moment().format(format));
-                    }
+                    noteContents = noteContents.replace(override, moment().format(format));
                 }
             }
         }

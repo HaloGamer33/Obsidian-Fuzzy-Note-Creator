@@ -34,23 +34,23 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
 
         // Autocomplete selected folder with tab.
         this.inputEl.addEventListener('keydown', async (event: KeyboardEvent) => {
-            if (event.key === 'Tab') {
-                event.preventDefault();
+            if (event.key !== 'Tab') { return; }
 
-                const suggestions = this.resultContainerEl.children;
-                for (let i = 0; i < suggestions.length; i++) {
-                    if (!suggestions[i].classList.contains('is-selected')) {
-                        continue;
-                    }
+            event.preventDefault();
 
-                    this.inputEl.value = suggestions[i].getText().replace(' Press ↵ to create folder.', '');
-
-                    // Trigger an input event to update suggestions
-                    const event = new Event('input', { bubbles: true, cancelable: true });
-                    this.inputEl.dispatchEvent(event);
-
-                    break;
+            const suggestions = this.resultContainerEl.children;
+            for (let i = 0; i < suggestions.length; i++) {
+                if (!suggestions[i].classList.contains('is-selected')) {
+                    continue;
                 }
+
+                this.inputEl.value = suggestions[i].getText().replace(' Press ↵ to create folder.', '');
+
+                // Trigger an input event to update suggestions
+                const event = new Event('input', { bubbles: true, cancelable: true });
+                this.inputEl.dispatchEvent(event);
+
+                break;
             }
         })
     }
@@ -103,8 +103,9 @@ export class FolderSelectionModal extends FuzzySuggestModal<Suggestion> {
     }
 
     onChooseItem(suggestion: Suggestion) {
-        // normalizePath is an obsidian function (I still do some work to normalize the path down the line)
         if (this.newDirSuggestion) {
+            // `normalizePath` is an obsidian function but I still need to do 
+            // some more work to normalize the path down the line.
             let path = normalizePath(this.newDirSuggestion.path);
             const windowsCompatibility: boolean = (
                 Platform.isWin || this.settings.windowsNoteTitleCompatibility
