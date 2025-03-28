@@ -1,4 +1,4 @@
-import { Notice, App, SuggestModal, normalizePath, moment, Instruction, Platform } from 'obsidian';
+import { Notice, App, SuggestModal, normalizePath, moment, Instruction, Platform, TFile } from 'obsidian';
 import { FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab';
 import { OpenNote } from './open-note';
 
@@ -13,6 +13,7 @@ type NoteType = "TitleTemplate" | "NoteTemplate";
 
 type Suggestion = {
     text: string;
+    template: string;
     type: NoteType;
     query?: string;
 }
@@ -27,7 +28,13 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
     leafMode: string;
     noteTemplate: NoteTemplate;
 
-    constructor(app: App, path: string, leafMode: string, settings: FuzzyNoteCreatorSettings, noteTemplate?: NoteTemplate) {
+    constructor(
+        app: App,
+        path: string,
+        leafMode: string,
+        settings: FuzzyNoteCreatorSettings,
+        noteTemplate?: NoteTemplate
+    ) {
         super(app)
         this.settings = settings
         this.path = path;
@@ -81,114 +88,103 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             return [];
         }
 
-        const hasNoteTemplate = this.noteTemplate !== undefined;
-        if (hasNoteTemplate) {
-            const noteTitleTemplates = this.settings.noteTitleTemplates.split('\n');
-            const trimmedTemplates = noteTitleTemplates.map(template => template.trim())
-            const filteredTemplates = trimmedTemplates.filter(template => {
-                return template.toLowerCase().includes(query.toLowerCase());
-            });
-
-            const areThereTemplates = filteredTemplates[0] !== "";
-            if (areThereTemplates) {
-                for (let i = 0; i < filteredTemplates.length; i++) {
-                    const currentTemplate = filteredTemplates[i];
-                    const suggestion: Suggestion = {
-                        text: currentTemplate,
-                        type: "TitleTemplate",
-                        query: query.trim(),
-                    }
-                    suggestions.push(suggestion);
-                }
-            }
-            return suggestions;
-        }
-
         if (this.settings.useNoteTitleTemplates) {
-            const noteTitleTemplates = this.settings.noteTitleTemplates.split('\n');
-            const trimmedTemplates = noteTitleTemplates.map(template => template.trim())
-            const filteredTemplates = trimmedTemplates.filter(template => {
-                return template.toLowerCase().includes(query.toLowerCase());
-            });
+            const titleTemplates = this.settings.noteTitleTemplates.split('\n');
+            const templates = titleTemplates.map(template => template.trim())
 
-            const areThereTemplates = filteredTemplates[0] !== "";
-            if (areThereTemplates) {
-                for (let i = 0; i < filteredTemplates.length; i++) {
-                    const currentTemplate = filteredTemplates[i];
+            for (let i = 0; i < templates.length; i++) {
+                const currentTemplate = templates[i];
+                const momentFormatedName = moment().format(currentTemplate);
+                const trimmedQuery = query.trim();
+                const querySplit = trimmedQuery.split(' ');
+                const queryElements: queryWrapper[] = querySplit.map(query => {
+                    return {
+                        query: query,
+                        found: false
+                    }
+                });
+                const templateSuggestion = `Title Template: ${momentFormatedName}`;
+                const suggestionElements = templateSuggestion.split(' ');
+
+                if (allQueryElementsFound(queryElements, suggestionElements)) {
                     const suggestion: Suggestion = {
-                        text: currentTemplate,
-                        type: "TitleTemplate",
+                        text: `Title Template: ${momentFormatedName}`,
+                        template: currentTemplate,
+                        type: 'TitleTemplate',
                         query: query.trim(),
                     }
                     suggestions.push(suggestion);
                 }
             }
         }
+
+        const skipBodyTemplate = this.noteTemplate !== undefined;
+        if (skipBodyTemplate) { return suggestions; }
 
         if (this.settings.useNoteTemplates) {
-            const allNotes = this.app.vault.getFiles();
-            const templatesFolder = this.settings.noteTemplatesFolder;
-            let noteTemplatesFilePaths: string[] = [];
+            const templatesFolderPath = this.settings.noteTemplatesFolder;
+            const templatesFolder = this.app.vault.getFolderByPath(templatesFolderPath);
+            const folderContents = templatesFolder!.children;
+            const bodyTemplates = folderContents.filter(abstractFile => {
+                return abstractFile instanceof TFile;
+            });
 
-            for (let i = 0; i < allNotes.length; i++) {
-                const currentNote = allNotes[i];
+            for (let i = 0; i < bodyTemplates.length; i++) {
+                const currentNote = bodyTemplates[i];
                 const notePath = currentNote.path;
-
-                if (notePath.startsWith(templatesFolder) === false) {
-                    continue;
-                }
-
-                if (query.trim() === "") {
-                    noteTemplatesFilePaths.push(notePath);
-                    continue;
-                }
-
-                type queryWrapper = {
-                    query: string;
-                    found: boolean;
-                }
-
-                const queryWrappers: queryWrapper[] = query.trim().split(" ").map((query) => {return {query: query, found: false}});
-                const pathElements = notePath.split(" ");
-                for (let p = 0; p < pathElements.length; p++) {
-                    let headIndex: number = 0;
-                    for (let q = 0; q < queryWrappers.length; q++) {
-                        if (queryWrappers[q].found === true) {
-                            continue;
-                        }
-
-                        const indexOfQuery = pathElements[p].toLowerCase().indexOf(queryWrappers[q].query.toLowerCase(), headIndex);
-                        if (indexOfQuery === -1) {
-                            break;
-                        }
-
-                        headIndex = indexOfQuery + queryWrappers[q].query.length;
-                        queryWrappers[q].found = true;
+                const trimmedQuery = query.trim();
+                const querySplit = trimmedQuery.split(' ');
+                const queryElements: queryWrapper[] = querySplit.map(query => {
+                    return {
+                        query: query,
+                        found: false
                     }
+                });
+                const templateSuggestion = `Note Template: ${notePath}`;
+                const suggestionElements = templateSuggestion.split(' ');
 
-                    let allFound = true;
-                    for (let t = 0; t < queryWrappers.length; t++) {
-                        if (queryWrappers[t].found === false) {allFound = false}
+                if (allQueryElementsFound(queryElements, suggestionElements)) {
+                    const currentTemplate = notePath;
+                    const suggestion: Suggestion = {
+                        text: `Note Template: ${currentTemplate}`,
+                        template: currentTemplate,
+                        type: 'NoteTemplate',
+                        query: query.trim(),
                     }
-
-                    if (allFound === true) {
-                        noteTemplatesFilePaths.push(notePath);
-                        break;
-                    }
+                    suggestions.push(suggestion);
                 }
-            }
-
-            for (let i = 0; i < noteTemplatesFilePaths.length; i++) {
-                const currentTemplate = noteTemplatesFilePaths[i];
-                const suggestion: Suggestion = {
-                    text: currentTemplate,
-                    type: "NoteTemplate",
-                    query: query.trim(),
-                }
-                suggestions.push(suggestion);
             }
         }
+
         return suggestions;
+
+        type queryWrapper = {
+            query: string;
+            found: boolean;
+        }
+
+        function allQueryElementsFound(
+            queryWrappers: queryWrapper[],
+            suggestionElements: string[]
+        ) {
+            for (let p = 0; p < suggestionElements.length; p++) {
+                let headIndex = 0;
+                for (let q = 0; q < queryWrappers.length; q++) {
+                    if (queryWrappers[q].found) continue;
+
+                    const indexOfQuery = suggestionElements[p].toLowerCase().indexOf(queryWrappers[q].query.toLowerCase(), headIndex);
+                    if (indexOfQuery === -1) break;
+
+                    headIndex = indexOfQuery + queryWrappers[q].query.length;
+                    queryWrappers[q].found = true;
+                }
+
+                if (queryWrappers.every(wrapper => wrapper.found)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     renderSuggestion(suggestion: Suggestion, el: HTMLElement) {
@@ -196,10 +192,12 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             switch (suggestion.type) {
                 //TODO: Add bold to the text that shows which type of template it is
                 case 'TitleTemplate':
-                    el.createEl("div", {text: `/BOLDNote Title Template/BOLD: ${suggestion.text}`});
+                    el.createEl('span', {cls: 'suggestion-highlight', text: `Title Template: `});
+                    el.createEl('span', {text: `${moment().format(suggestion.template)}`});
                     break;
                 case 'NoteTemplate':
-                    el.createEl('div', {text: `/BOLDNote Template/BOLD: ${suggestion.text}`});
+                    el.createEl('span', {cls: 'suggestion-highlight', text: `Note Template: `});
+                    el.createEl('span', {text: `${suggestion.template}`});
                     break;
             }
         }
@@ -232,12 +230,12 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
     onChooseSuggestion(suggestion: Suggestion, evt: MouseEvent | KeyboardEvent) {
         if (suggestion.type === "TitleTemplate") {
-            const formatedNoteTitle = moment().format(suggestion.text)
+            const formatedNoteTitle = moment().format(suggestion.template)
             this.createNote(evt, new BooleanWrapper(false), formatedNoteTitle)
         }
 
         if (suggestion.type === "NoteTemplate") {
-            const template: NoteTemplate = {path: suggestion.text};
+            const template: NoteTemplate = {path: suggestion.template};
             new NoteCreationModal(this.app, this.path, this.leafMode, this.settings, template).open();
         }
     }
