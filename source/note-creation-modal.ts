@@ -64,14 +64,14 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             }
         });
 
-        if (!settings.useNoteTitleTemplates) {
+        if (!settings.usingTitleTemplates) {
             this.inputEl.addEventListener('keyup', event => {
                 this.createNote(event, previousModalJustClosed)
             });
             return;
         }
 
-        if (settings.useNoteTitleTemplates || noteTemplate !== undefined) {
+        if (settings.usingTitleTemplates || noteTemplate !== undefined) {
             this.inputEl.addEventListener('keyup', event => {
                 this.emptySuggestionsCatcher(event, previousModalJustClosed)
             });
@@ -82,14 +82,14 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
     getSuggestions(query: string): Suggestion[] {
         let suggestions: Suggestion[] = [];
 
-        const noTemplatesEnabled = !this.settings.useNoteTitleTemplates && !this.settings.useNoteTemplates;
+        const noTemplatesEnabled = !this.settings.usingTitleTemplates && !this.settings.usingNoteTemplates;
         if (noTemplatesEnabled) {
             this.resultContainerEl.hide();
             return [];
         }
 
-        if (this.settings.useNoteTitleTemplates) {
-            const titleTemplates = this.settings.noteTitleTemplates.split('\n');
+        if (this.settings.usingTitleTemplates) {
+            const titleTemplates = this.settings.titleTemplates.split('\n');
             const templates = titleTemplates.map(template => template.trim())
 
             for (let i = 0; i < templates.length; i++) {
@@ -121,7 +121,7 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         const skipBodyTemplate = this.noteTemplate !== undefined;
         if (skipBodyTemplate) { return suggestions; }
 
-        if (this.settings.useNoteTemplates) {
+        if (this.settings.usingNoteTemplates) {
             const templatesFolderPath = this.settings.noteTemplatesFolder;
             const templatesFolder = this.app.vault.getFolderByPath(templatesFolderPath);
             const folderContents = templatesFolder!.children;

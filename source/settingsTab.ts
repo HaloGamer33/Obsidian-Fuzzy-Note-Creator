@@ -8,9 +8,9 @@ export interface FuzzyNoteCreatorSettings {
     allowUntitledNotes:              boolean;
     defaultNoteExtension:            string;
     untitledNoteName:                string;
-    useNoteTitleTemplates:           boolean;
-    noteTitleTemplates:              string;
-    useNoteTemplates:                boolean;
+    usingTitleTemplates:             boolean;
+    titleTemplates:                  string;
+    usingNoteTemplates:              boolean;
     noteTemplatesFolder:             string;
     dateFormat:                      string;
     timeFormat:                      string;
@@ -27,8 +27,8 @@ export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
     allowUntitledNotes:            true,
     defaultNoteExtension:          '.md',
     untitledNoteName:              'Untitled',
-    useNoteTitleTemplates:         false,
-    useNoteTemplates:              false,
+    usingTitleTemplates:         false,
+    usingNoteTemplates:              false,
     overrideNewNote:               false,
     overrideCommand:               'new-note',
     currentFolderFirst:            true,
@@ -192,9 +192,9 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         .setDesc('Whether to use templates that define the contents of the new note.')
         .addToggle((slider) => {
             slider
-            .setValue(this.plugin.settings.useNoteTemplates)
+            .setValue(this.plugin.settings.usingNoteTemplates)
             .onChange(async (value: boolean) => {
-                this.plugin.settings.useNoteTemplates = value;
+                this.plugin.settings.usingNoteTemplates = value;
                 await this.plugin.saveSettings();
             });
         });
@@ -365,9 +365,9 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         .setDesc('Whether to use templates that replace dates and are displayed to you when giving your note a title.')
         .addToggle((slider) => {
             slider
-            .setValue(this.plugin.settings.useNoteTitleTemplates)
+            .setValue(this.plugin.settings.usingTitleTemplates)
             .onChange(async (value: boolean) => {
-                this.plugin.settings.useNoteTitleTemplates = value;
+                this.plugin.settings.usingTitleTemplates = value;
                 await this.plugin.saveSettings();
             });
         });
@@ -391,11 +391,11 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         .addTextArea((text) => {
             text
             .setPlaceholder('YYYY-MM-DD')
-            .setValue(this.plugin.settings.noteTitleTemplates)
+            .setValue(this.plugin.settings.titleTemplates)
             .onChange(async (value) => {
                 const trimmedValue = value.trim();
 
-                this.plugin.settings.noteTitleTemplates = trimmedValue;
+                this.plugin.settings.titleTemplates = trimmedValue;
                 await this.plugin.saveSettings();
             });
             text.inputEl.setCssStyles({resize: "none"})
