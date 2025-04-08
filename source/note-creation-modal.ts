@@ -1,4 +1,13 @@
-import { Notice, App, SuggestModal, normalizePath, moment, Instruction, Platform, TFile } from 'obsidian';
+import {
+    Notice,
+    App,
+    SuggestModal,
+    normalizePath,
+    moment,
+    Instruction,
+    Platform,
+    TFile,
+} from 'obsidian';
 import { FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab';
 import { OpenNote } from './open-note';
 
@@ -9,18 +18,18 @@ class BooleanWrapper {
     }
 }
 
-type NoteType = "TitleTemplate" | "NoteTemplate";
+type NoteType = 'TitleTemplate' | 'NoteTemplate';
 
 type Suggestion = {
     text: string;
     template: string;
     type: NoteType;
     query?: string;
-}
+};
 
 type NoteTemplate = {
     path: string;
-}
+};
 
 export class NoteCreationModal extends SuggestModal<Suggestion> {
     settings: FuzzyNoteCreatorSettings;
@@ -33,10 +42,10 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         path: string,
         leafMode: string,
         settings: FuzzyNoteCreatorSettings,
-        noteTemplate?: NoteTemplate
+        noteTemplate?: NoteTemplate,
     ) {
-        super(app)
-        this.settings = settings
+        super(app);
+        this.settings = settings;
         this.path = path;
         this.leafMode = leafMode;
 
@@ -49,31 +58,31 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
         if (settings.showInstructions) {
             const instructions: Instruction[] = [
-                {command: '↵', purpose: 'to create note/select template'},
-                {command: 'ctrl + ↵', purpose: 'to force create note'},
-                {command: 'esc', purpose: 'to dismiss'},
+                { command: '↵', purpose: 'to create note/select template' },
+                { command: 'ctrl + ↵', purpose: 'to force create note' },
+                { command: 'esc', purpose: 'to dismiss' },
                 // {command: '/', purpose: 'to create parent folder of the note'},
             ];
             this.setInstructions(instructions);
         }
 
         let previousModalJustClosed = new BooleanWrapper(true);
-        this.inputEl.addEventListener('keydown', event => {
-            if (event.key == "Enter" && event.ctrlKey == true) {
+        this.inputEl.addEventListener('keydown', (event) => {
+            if (event.key == 'Enter' && event.ctrlKey == true) {
                 this.createNote(event, previousModalJustClosed);
             }
         });
 
         if (!settings.usingTitleTemplates) {
-            this.inputEl.addEventListener('keyup', event => {
-                this.createNote(event, previousModalJustClosed)
+            this.inputEl.addEventListener('keyup', (event) => {
+                this.createNote(event, previousModalJustClosed);
             });
             return;
         }
 
         if (settings.usingTitleTemplates || noteTemplate !== undefined) {
-            this.inputEl.addEventListener('keyup', event => {
-                this.emptySuggestionsCatcher(event, previousModalJustClosed)
+            this.inputEl.addEventListener('keyup', (event) => {
+                this.emptySuggestionsCatcher(event, previousModalJustClosed);
             });
             return;
         }
@@ -82,7 +91,9 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
     getSuggestions(query: string): Suggestion[] {
         let suggestions: Suggestion[] = [];
 
-        const noTemplatesEnabled = !this.settings.usingTitleTemplates && !this.settings.usingNoteTemplates;
+        const noTemplatesEnabled =
+            !this.settings.usingTitleTemplates &&
+            !this.settings.usingNoteTemplates;
         if (noTemplatesEnabled) {
             this.resultContainerEl.hide();
             return [];
@@ -90,19 +101,21 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
         if (this.settings.usingTitleTemplates) {
             const titleTemplates = this.settings.titleTemplates.split('\n');
-            const templates = titleTemplates.map(template => template.trim())
+            const templates = titleTemplates.map((template) => template.trim());
 
             for (let i = 0; i < templates.length; i++) {
                 const currentTemplate = templates[i];
                 const momentFormatedName = moment().format(currentTemplate);
                 const trimmedQuery = query.trim();
                 const querySplit = trimmedQuery.split(' ');
-                const queryElements: queryWrapper[] = querySplit.map(query => {
-                    return {
-                        query: query,
-                        found: false
-                    }
-                });
+                const queryElements: queryWrapper[] = querySplit.map(
+                    (query) => {
+                        return {
+                            query: query,
+                            found: false,
+                        };
+                    },
+                );
                 const templateSuggestion = `Title Template: ${momentFormatedName}`;
                 const suggestionElements = templateSuggestion.split(' ');
 
@@ -112,20 +125,23 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
                         template: currentTemplate,
                         type: 'TitleTemplate',
                         query: query.trim(),
-                    }
+                    };
                     suggestions.push(suggestion);
                 }
             }
         }
 
         const skipBodyTemplate = this.noteTemplate !== undefined;
-        if (skipBodyTemplate) { return suggestions; }
+        if (skipBodyTemplate) {
+            return suggestions;
+        }
 
         if (this.settings.usingNoteTemplates) {
             const templatesFolderPath = this.settings.noteTemplatesFolder;
-            const templatesFolder = this.app.vault.getFolderByPath(templatesFolderPath);
+            const templatesFolder =
+                this.app.vault.getFolderByPath(templatesFolderPath);
             const folderContents = templatesFolder!.children;
-            const bodyTemplates = folderContents.filter(abstractFile => {
+            const bodyTemplates = folderContents.filter((abstractFile) => {
                 return abstractFile instanceof TFile;
             });
 
@@ -134,12 +150,14 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
                 const notePath = currentNote.path;
                 const trimmedQuery = query.trim();
                 const querySplit = trimmedQuery.split(' ');
-                const queryElements: queryWrapper[] = querySplit.map(query => {
-                    return {
-                        query: query,
-                        found: false
-                    }
-                });
+                const queryElements: queryWrapper[] = querySplit.map(
+                    (query) => {
+                        return {
+                            query: query,
+                            found: false,
+                        };
+                    },
+                );
                 const templateSuggestion = `Note Template: ${notePath}`;
                 const suggestionElements = templateSuggestion.split(' ');
 
@@ -150,7 +168,7 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
                         template: currentTemplate,
                         type: 'NoteTemplate',
                         query: query.trim(),
-                    }
+                    };
                     suggestions.push(suggestion);
                 }
             }
@@ -161,25 +179,30 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         type queryWrapper = {
             query: string;
             found: boolean;
-        }
+        };
 
         function allQueryElementsFound(
             queryWrappers: queryWrapper[],
-            suggestionElements: string[]
+            suggestionElements: string[],
         ) {
             for (let p = 0; p < suggestionElements.length; p++) {
                 let headIndex = 0;
                 for (let q = 0; q < queryWrappers.length; q++) {
                     if (queryWrappers[q].found) continue;
 
-                    const indexOfQuery = suggestionElements[p].toLowerCase().indexOf(queryWrappers[q].query.toLowerCase(), headIndex);
+                    const indexOfQuery = suggestionElements[p]
+                        .toLowerCase()
+                        .indexOf(
+                            queryWrappers[q].query.toLowerCase(),
+                            headIndex,
+                        );
                     if (indexOfQuery === -1) break;
 
                     headIndex = indexOfQuery + queryWrappers[q].query.length;
                     queryWrappers[q].found = true;
                 }
 
-                if (queryWrappers.every(wrapper => wrapper.found)) {
+                if (queryWrappers.every((wrapper) => wrapper.found)) {
                     return true;
                 }
             }
@@ -192,12 +215,20 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             switch (suggestion.type) {
                 //TODO: Add bold to the text that shows which type of template it is
                 case 'TitleTemplate':
-                    el.createEl('span', {cls: 'suggestion-highlight', text: `Title Template: `});
-                    el.createEl('span', {text: `${moment().format(suggestion.template)}`});
+                    el.createEl('span', {
+                        cls: 'suggestion-highlight',
+                        text: `Title Template: `,
+                    });
+                    el.createEl('span', {
+                        text: `${moment().format(suggestion.template)}`,
+                    });
                     break;
                 case 'NoteTemplate':
-                    el.createEl('span', {cls: 'suggestion-highlight', text: `Note Template: `});
-                    el.createEl('span', {text: `${suggestion.template}`});
+                    el.createEl('span', {
+                        cls: 'suggestion-highlight',
+                        text: `Note Template: `,
+                    });
+                    el.createEl('span', { text: `${suggestion.template}` });
                     break;
             }
         }
@@ -206,37 +237,66 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
-        if (suggestion.query !== undefined && suggestion.query !== "") {
-            const queryElements = suggestion.query.split(" ").filter((suggestion) => {return suggestion !== "";});
+        if (suggestion.query !== undefined && suggestion.query !== '') {
+            const queryElements = suggestion.query
+                .split(' ')
+                .filter((suggestion) => {
+                    return suggestion !== '';
+                });
 
             let startIndex = 0;
-            const parentDiv = el.createEl("div");
+            const parentDiv = el.createEl('div');
             for (let i = 0; i < queryElements.length; i++) {
-                const regex = new RegExp(escapeRegExp(String.raw`${queryElements[i]}`), "gi");
+                const regex = new RegExp(
+                    escapeRegExp(String.raw`${queryElements[i]}`),
+                    'gi',
+                );
                 let match;
-                match = regex.exec(suggestion.text.slice(startIndex))
+                match = regex.exec(suggestion.text.slice(startIndex));
                 if (match !== null) {
-                    parentDiv.createEl("span", {text: suggestion.text.slice(startIndex, match.index + startIndex)});
-                    parentDiv.createEl("span", {text: suggestion.text.slice(match.index + startIndex, queryElements[i].length + startIndex + match.index), cls: "suggestion-highlight"});
+                    parentDiv.createEl('span', {
+                        text: suggestion.text.slice(
+                            startIndex,
+                            match.index + startIndex,
+                        ),
+                    });
+                    parentDiv.createEl('span', {
+                        text: suggestion.text.slice(
+                            match.index + startIndex,
+                            queryElements[i].length + startIndex + match.index,
+                        ),
+                        cls: 'suggestion-highlight',
+                    });
                     startIndex += queryElements[i].length + match.index;
                 }
             }
 
             if (startIndex !== suggestion.text.length) {
-                parentDiv.createEl("span", {text: suggestion.text.slice(startIndex)});
+                parentDiv.createEl('span', {
+                    text: suggestion.text.slice(startIndex),
+                });
             }
         }
     }
 
-    onChooseSuggestion(suggestion: Suggestion, evt: MouseEvent | KeyboardEvent) {
-        if (suggestion.type === "TitleTemplate") {
-            const formatedNoteTitle = moment().format(suggestion.template)
-            this.createNote(evt, new BooleanWrapper(false), formatedNoteTitle)
+    onChooseSuggestion(
+        suggestion: Suggestion,
+        evt: MouseEvent | KeyboardEvent,
+    ) {
+        if (suggestion.type === 'TitleTemplate') {
+            const formatedNoteTitle = moment().format(suggestion.template);
+            this.createNote(evt, new BooleanWrapper(false), formatedNoteTitle);
         }
 
-        if (suggestion.type === "NoteTemplate") {
-            const template: NoteTemplate = {path: suggestion.template};
-            new NoteCreationModal(this.app, this.path, this.leafMode, this.settings, template).open();
+        if (suggestion.type === 'NoteTemplate') {
+            const template: NoteTemplate = { path: suggestion.template };
+            new NoteCreationModal(
+                this.app,
+                this.path,
+                this.leafMode,
+                this.settings,
+                template,
+            ).open();
         }
     }
 
@@ -246,19 +306,25 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
     //  ── Create Note Call Back ───────────────────────────────────────────
 
-    async createNote(event: KeyboardEvent | MouseEvent, previousModalJustClosed: BooleanWrapper, noteName?: string) {
-        const isKeyboardEvent = (event: KeyboardEvent | MouseEvent): event is KeyboardEvent => "key" in event;
+    async createNote(
+        event: KeyboardEvent | MouseEvent,
+        previousModalJustClosed: BooleanWrapper,
+        noteName?: string,
+    ) {
+        const isKeyboardEvent = (
+            event: KeyboardEvent | MouseEvent,
+        ): event is KeyboardEvent => 'key' in event;
 
-        if(isKeyboardEvent(event)) {
-            const {key} = event;
-            if (key !== 'Enter') { 
-                return 
+        if (isKeyboardEvent(event)) {
+            const { key } = event;
+            if (key !== 'Enter') {
+                return;
             }
         }
 
         // Check to see if the previous menu has just closed, to prevent
         // a ghost enter that creates a untitled note.
-        
+
         if (previousModalJustClosed.value) {
             previousModalJustClosed.value = false;
             return;
@@ -271,20 +337,28 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         noteName = noteName.trim();
 
         if (noteName.length == 0 && !this.settings.allowUntitledNotes) {
-            new Notice('Add a title to the note' , 2000);
+            new Notice('Add a title to the note', 2000);
             return;
         }
 
         if (noteName.length == 0 && this.settings.allowUntitledNotes) {
-            noteName = (this.settings.untitledNoteName.length == 0) ? DEFAULT_SETTINGS.untitledNoteName! : this.settings.untitledNoteName!;
+            noteName =
+                this.settings.untitledNoteName.length == 0 ?
+                    DEFAULT_SETTINGS.untitledNoteName!
+                :   this.settings.untitledNoteName!;
         }
 
-        const windowsCompatibility: boolean = (
-            Platform.isWin || this.settings.windowsNoteTitleCompatibility
-        );
+        const windowsCompatibility: boolean =
+            Platform.isWin || this.settings.windowsNoteTitleCompatibility;
 
-        if (windowsCompatibility && noteName.match(/(<|>|:|"|\||\?|\*)/) !== null) {
-            new Notice(`The note title must not include any of this characters: < > : " ? | *`, 2000);
+        if (
+            windowsCompatibility &&
+            noteName.match(/(<|>|:|"|\||\?|\*)/) !== null
+        ) {
+            new Notice(
+                `The note title must not include any of this characters: < > : " ? | *`,
+                2000,
+            );
             return;
         }
 
@@ -298,7 +372,10 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         }
 
         if (noteName.match(/(\/|\\)/) !== null) {
-            let noteNameWithDirs = normalizePath(noteName).split('/').map(link => link.trim()).filter(link => link.length !== 0);
+            let noteNameWithDirs = normalizePath(noteName)
+                .split('/')
+                .map((link) => link.trim())
+                .filter((link) => link.length !== 0);
             let parentDirs = `${this.path}/`;
             for (let i = 0; i < noteNameWithDirs.length - 1; i++) {
                 noteNameWithDirs[i] += '/';
@@ -317,24 +394,39 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             noteExtension = DEFAULT_SETTINGS.defaultNoteExtension!;
         }
 
-        if (windowsCompatibility && noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null) {
-            new Notice(`The note extension must not include any of this characters: < > : " \ ? | * /`, 2000);
+        if (
+            windowsCompatibility &&
+            noteExtension.match(/(<|>|:|"|\\|\||\?|\/|\*|\/)/) !== null
+        ) {
+            new Notice(
+                `The note extension must not include any of this characters: < > : " \ ? | * /`,
+                2000,
+            );
             return;
         }
 
         if (noteExtension.match(/(\/)/) !== null) {
-            new Notice(`The note extension must not include the character: /`, 2000);
+            new Notice(
+                `The note extension must not include the character: /`,
+                2000,
+            );
             return;
         }
 
-        const notePath = (this.path.length == 1) ? `${noteName}${noteExtension}` : `${this.path}/${noteName}${noteExtension}`;
+        const notePath =
+            this.path.length == 1 ?
+                `${noteName}${noteExtension}`
+            :   `${this.path}/${noteName}${noteExtension}`;
 
-        const normalizedNotePath= normalizePath(notePath);
+        const normalizedNotePath = normalizePath(notePath);
 
         let fileAlreadyExists = false;
         const loadedFiles = this.app.vault.getFiles();
         for (let i = 0; i < loadedFiles.length; i++) {
-            if (loadedFiles[i].path.toLowerCase() === normalizedNotePath.toLowerCase()) {
+            if (
+                loadedFiles[i].path.toLowerCase() ===
+                normalizedNotePath.toLowerCase()
+            ) {
                 fileAlreadyExists = true;
             }
         }
@@ -344,20 +436,28 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             return;
         }
 
-        let noteContents = "";
+        let noteContents = '';
         if (this.noteTemplate !== undefined) {
             const noteTemplatePath = this.noteTemplate.path;
             const templateFile = this.app.vault.getFileByPath(noteTemplatePath);
 
-            if (templateFile == null) { return; }
+            if (templateFile == null) {
+                return;
+            }
 
             noteContents = await this.app.vault.read(templateFile);
 
             const timeFormat = this.settings.timeFormat;
             const dateFormat = this.settings.dateFormat;
 
-            const validTimeFormat = (timeFormat === undefined || timeFormat === "") ? "HH:mm" : timeFormat;
-            const validDateFormat = (dateFormat === undefined || dateFormat === "") ? "YYYY-MM-DD" : dateFormat;
+            const validTimeFormat =
+                timeFormat === undefined || timeFormat === '' ?
+                    'HH:mm'
+                :   timeFormat;
+            const validDateFormat =
+                dateFormat === undefined || dateFormat === '' ?
+                    'YYYY-MM-DD'
+                :   dateFormat;
 
             const formatedTime = moment().format(validTimeFormat);
             const formatedDate = moment().format(validDateFormat);
@@ -365,8 +465,14 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
             noteContents = noteContents.replace(/{{time}}/g, formatedTime);
             noteContents = noteContents.replace(/{{date}}/g, formatedDate);
 
-            const overrideDateRegex = new RegExp(String.raw`{{date:(.+)}}`, "g");
-            const overrideTimeRegex = new RegExp(String.raw`{{time:(.+)}}`, "g");
+            const overrideDateRegex = new RegExp(
+                String.raw`{{date:(.+)}}`,
+                'g',
+            );
+            const overrideTimeRegex = new RegExp(
+                String.raw`{{time:(.+)}}`,
+                'g',
+            );
 
             const matchesDate = noteContents.matchAll(overrideDateRegex);
             const matchesTime = noteContents.matchAll(overrideTimeRegex);
@@ -377,7 +483,10 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
                     const override = matchesArray[i][0];
                     const format = matchesArray[i][1];
 
-                    noteContents = noteContents.replace(override, moment().format(format));
+                    noteContents = noteContents.replace(
+                        override,
+                        moment().format(format),
+                    );
                 }
             }
 
@@ -387,12 +496,18 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
                     const override = matchesArray[i][0];
                     const format = matchesArray[i][1];
 
-                    noteContents = noteContents.replace(override, moment().format(format));
+                    noteContents = noteContents.replace(
+                        override,
+                        moment().format(format),
+                    );
                 }
             }
         }
 
-        const newNote = await this.app.vault.create(`${normalizedNotePath}`, noteContents);
+        const newNote = await this.app.vault.create(
+            `${normalizedNotePath}`,
+            noteContents,
+        );
 
         if (newNote == null) {
             new Notice('Error opening the file, report issue to GitHub', 2000);
@@ -400,7 +515,10 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         }
 
         if (newNote.extension !== 'md') {
-            new Notice(`Created note ${noteName}${noteExtension}, opening it on the system's default application if there is one`, 4000);
+            new Notice(
+                `Created note ${noteName}${noteExtension}, opening it on the system's default application if there is one`,
+                4000,
+            );
         }
 
         OpenNote.bind(this)(newNote);
@@ -408,13 +526,18 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
 
     //  ── Empty Suggestions Catcher ───────────────────────────────────────
 
-    async emptySuggestionsCatcher(event: KeyboardEvent | MouseEvent, previousModalJustClosed: BooleanWrapper) {
-        const isKeyboardEvent = (event: KeyboardEvent | MouseEvent): event is KeyboardEvent => "key" in event;
+    async emptySuggestionsCatcher(
+        event: KeyboardEvent | MouseEvent,
+        previousModalJustClosed: BooleanWrapper,
+    ) {
+        const isKeyboardEvent = (
+            event: KeyboardEvent | MouseEvent,
+        ): event is KeyboardEvent => 'key' in event;
 
-        if(isKeyboardEvent(event)) {
-            const {key} = event;
-            if (key !== 'Enter') { 
-                return 
+        if (isKeyboardEvent(event)) {
+            const { key } = event;
+            if (key !== 'Enter') {
+                return;
             }
         }
 
@@ -424,10 +547,10 @@ export class NoteCreationModal extends SuggestModal<Suggestion> {
         }
 
         /* This only triggers if the user pressed 'enter' when no suggestion was displayed,
-        * aka: doesn't want to use any template and wants to create a blank note. Otherwise
-        * the program goes to the function 'OnChooseSuggestion' */
+         * aka: doesn't want to use any template and wants to create a blank note. Otherwise
+         * the program goes to the function 'OnChooseSuggestion' */
         if (this.getSuggestions(this.inputEl.value).length === 0) {
-            this.createNote(event, previousModalJustClosed)
+            this.createNote(event, previousModalJustClosed);
         }
     }
 }
