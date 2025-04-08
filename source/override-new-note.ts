@@ -6,12 +6,12 @@ let originalButton: Element;
 // Credit to https://stackoverflow.com/users/492336/sashoalma - https://stackoverflow.com/users/4556536/yong-wang
 // (not sure how stackoverflow works and it shows two names on the answer so... i put both in here)
 function waitForElement(selector: string) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         if (document.querySelector(selector)) {
             return resolve(document.querySelector(selector));
         }
 
-        const observer = new MutationObserver(_ => {
+        const observer = new MutationObserver((_) => {
             if (document.querySelector(selector)) {
                 observer.disconnect();
                 resolve(document.querySelector(selector));
@@ -20,13 +20,13 @@ function waitForElement(selector: string) {
 
         observer.observe(document.body, {
             childList: true,
-            subtree: true
+            subtree: true,
         });
     });
 }
 
 export async function OverrideNewNote() {
-    await waitForElement('[aria-label="New note"]')
+    await waitForElement('[aria-label="New note"]');
 
     const newNoteButton = document.querySelector('[aria-label="New note"]');
     if (newNoteButton) {
@@ -38,7 +38,11 @@ export async function OverrideNewNote() {
         newNoteButton.parentNode!.replaceChild(modifiedButton, newNoteButton);
 
         modifiedButton.addEventListener('click', () => {
-            new FolderSelectionModal(this.app, this.settings.overrideCommand, this.settings).open();
+            new FolderSelectionModal(
+                this.app,
+                this.settings.overrideCommand,
+                this.settings,
+            ).open();
         });
     }
 }
@@ -48,7 +52,7 @@ export async function RestoreNewNote() {
         return;
     }
 
-    await waitForElement('[aria-label="New note"]')
+    await waitForElement('[aria-label="New note"]');
 
     const modifiedButton = document.querySelector('[aria-label="New note"]');
 

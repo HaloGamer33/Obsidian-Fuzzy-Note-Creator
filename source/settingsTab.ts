@@ -3,42 +3,42 @@ import { App, PluginSettingTab, Setting, Platform, moment } from 'obsidian';
 import { OverrideNewNote, RestoreNewNote } from './override-new-note';
 
 export interface FuzzyNoteCreatorSettings {
-    showInstructions:                boolean;
-    windowsNoteTitleCompatibility:   boolean,
-    allowUntitledNotes:              boolean;
-    defaultNoteExtension:            string;
-    untitledNoteName:                string;
-    usingTitleTemplates:             boolean;
-    titleTemplates:                  string;
-    usingNoteTemplates:              boolean;
-    noteTemplatesFolder:             string;
-    dateFormat:                      string;
-    timeFormat:                      string;
-    overrideNewNote:                 boolean;
-    overrideCommand:                 string;
-    currentFolderFirst:              boolean;
-    currentFolderRecommendation:     boolean;
+    showInstructions: boolean;
+    windowsNoteTitleCompatibility: boolean;
+    allowUntitledNotes: boolean;
+    defaultNoteExtension: string;
+    untitledNoteName: string;
+    usingTitleTemplates: boolean;
+    titleTemplates: string;
+    usingNoteTemplates: boolean;
+    noteTemplatesFolder: string;
+    dateFormat: string;
+    timeFormat: string;
+    overrideNewNote: boolean;
+    overrideCommand: string;
+    currentFolderFirst: boolean;
+    currentFolderRecommendation: boolean;
     currentFolderRecommendationName: string;
 }
 
 export const DEFAULT_SETTINGS: Partial<FuzzyNoteCreatorSettings> = {
-    showInstructions:              true,
+    showInstructions: true,
     windowsNoteTitleCompatibility: false,
-    allowUntitledNotes:            true,
-    defaultNoteExtension:          '.md',
-    untitledNoteName:              'Untitled',
-    usingTitleTemplates:           false,
-    usingNoteTemplates:            false,
-    overrideNewNote:               false,
-    overrideCommand:               'new-note',
-    currentFolderFirst:            true,
-    currentFolderRecommendation:   false,
+    allowUntitledNotes: true,
+    defaultNoteExtension: '.md',
+    untitledNoteName: 'Untitled',
+    usingTitleTemplates: false,
+    usingNoteTemplates: false,
+    overrideNewNote: false,
+    overrideCommand: 'new-note',
+    currentFolderFirst: true,
+    currentFolderRecommendation: false,
     currentFolderRecommendationName: 'Current Folder',
 };
 
 export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
-    plugin: FuzzyNoteCreatorPlugin
-    app: App
+    plugin: FuzzyNoteCreatorPlugin;
+    app: App;
 
     constructor(app: App, plugin: FuzzyNoteCreatorPlugin) {
         super(app, plugin);
@@ -57,7 +57,9 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Show instructions')
-            .setDesc('Whether to show the instructions on how to use the plugin when using it')
+            .setDesc(
+                'Whether to show the instructions on how to use the plugin when using it',
+            )
             .addToggle((slider) => {
                 slider
                     .setValue(this.plugin.settings.showInstructions)
@@ -70,12 +72,17 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         if (!Platform.isWin) {
             new Setting(containerEl)
                 .setName('Windows note title compatibility')
-                .setDesc('When turned on, the plugin won\'t allow you to title notes with Window\'s illegal characters even if you are not on Windows. If running on windows this setting has no effect.')
+                .setDesc(
+                    "When turned on, the plugin won't allow you to title notes with Window's illegal characters even if you are not on Windows. If running on windows this setting has no effect.",
+                )
                 .addToggle((slider) => {
                     slider
-                        .setValue(this.plugin.settings.windowsNoteTitleCompatibility)
+                        .setValue(
+                            this.plugin.settings.windowsNoteTitleCompatibility,
+                        )
                         .onChange(async (value: boolean) => {
-                            this.plugin.settings.windowsNoteTitleCompatibility = value;
+                            this.plugin.settings.windowsNoteTitleCompatibility =
+                                value;
                             await this.plugin.saveSettings();
                         });
                 });
@@ -85,24 +92,26 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             .setName('File extension')
             .setDesc('Default file extension of the notes')
             .addText((text) => {
-                text
-                    .setPlaceholder('.md')
+                text.setPlaceholder('.md')
                     .setValue(this.plugin.settings.defaultNoteExtension)
                     .onChange(async (value) => {
-                        this.plugin.settings.defaultNoteExtension = value.trim();
+                        this.plugin.settings.defaultNoteExtension =
+                            value.trim();
                         await this.plugin.saveSettings();
-                    })
+                    });
             });
 
         // ╭─────────────────────────────────────────────────────────╮
         // │                 Current Folder Settings                 │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', { text: 'Current Folder Recommendations'});
+        containerEl.createEl('h6', { text: 'Current Folder Recommendations' });
 
         new Setting(containerEl)
             .setName('Current folder first')
-            .setDesc('When creating a new note, and you have not written anything into the text box, the first folder recommendation will be your current folder.')
+            .setDesc(
+                'When creating a new note, and you have not written anything into the text box, the first folder recommendation will be your current folder.',
+            )
             .addToggle((slider) => {
                 slider
                     .setValue(this.plugin.settings.currentFolderFirst)
@@ -114,44 +123,54 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Current folder recommendation')
-            .setDesc('When turned on, a Recommendation named "Current Folder" will be available on the folder selection, you can change the name of the recommendation on the next setting.')
+            .setDesc(
+                'When turned on, a Recommendation named "Current Folder" will be available on the folder selection, you can change the name of the recommendation on the next setting.',
+            )
             .addToggle((slider) => {
                 slider
                     .setValue(this.plugin.settings.currentFolderRecommendation)
                     .onChange(async (value: boolean) => {
-                        this.plugin.settings.currentFolderRecommendation = value;
+                        this.plugin.settings.currentFolderRecommendation =
+                            value;
                         await this.plugin.saveSettings();
                     });
             });
 
         new Setting(containerEl)
             .setName('Current folder recommendation name')
-            .setDesc('The name of the "Current Folder" recomendation on the folder selection.')
+            .setDesc(
+                'The name of the "Current Folder" recomendation on the folder selection.',
+            )
             .addText((text) => {
-                text
-                    .setPlaceholder('Current Folder')
-                    .setValue(this.plugin.settings.currentFolderRecommendationName)
+                text.setPlaceholder('Current Folder')
+                    .setValue(
+                        this.plugin.settings.currentFolderRecommendationName,
+                    )
                     .onChange(async (value) => {
                         let trimmedValue = value.trim();
                         if (trimmedValue == '') {
-                            this.plugin.settings.currentFolderRecommendationName = DEFAULT_SETTINGS.currentFolderRecommendationName!;
+                            this.plugin.settings.currentFolderRecommendationName =
+                                DEFAULT_SETTINGS.currentFolderRecommendationName!;
                             await this.plugin.saveSettings();
                             return;
                         }
-                        this.plugin.settings.currentFolderRecommendationName = trimmedValue;
+                        this.plugin.settings.currentFolderRecommendationName =
+                            trimmedValue;
                         await this.plugin.saveSettings();
-                    })
+                    });
             });
 
         // ╭─────────────────────────────────────────────────────────╮
         // │                     Untitled Notes                      │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', { text: 'Untitled Notes'});
+        containerEl.createEl('h6', { text: 'Untitled Notes' });
 
         new Setting(containerEl)
             .setName('Allow untitled notes')
-            .setDesc('When you create a note without giving it a title, the program will use the default title specified in the \'Name for untitled notes\' setting. However, if this setting is turned off, the program will ask you to enter a title for the note.')
+            .setDesc(
+                "When you create a note without giving it a title, the program will use the default title specified in the 'Name for untitled notes' setting. However, if this setting is turned off, the program will ask you to enter a title for the note.",
+            )
             .addToggle((slider) => {
                 slider
                     .setValue(this.plugin.settings.allowUntitledNotes)
@@ -165,8 +184,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             .setName('Name for untitled notes')
             .setDesc('Default name for untitled notes')
             .addText((text) => {
-                text
-                    .setPlaceholder('Untitled')
+                text.setPlaceholder('Untitled')
                     .setValue(this.plugin.settings.untitledNoteName)
                     .onChange(async (value) => {
                         const trimmedValue = value.trim();
@@ -178,18 +196,20 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
 
                         this.plugin.settings.untitledNoteName = trimmedValue;
                         await this.plugin.saveSettings();
-                    })
+                    });
             });
 
         // ╭─────────────────────────────────────────────────────────╮
         // │                     Note Templates                      │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', {text: 'Note Templates'});
+        containerEl.createEl('h6', { text: 'Note Templates' });
 
         new Setting(containerEl)
             .setName('Use note templates')
-            .setDesc('Whether to use templates that define the contents of the new note.')
+            .setDesc(
+                'Whether to use templates that define the contents of the new note.',
+            )
             .addToggle((slider) => {
                 slider
                     .setValue(this.plugin.settings.usingNoteTemplates)
@@ -202,44 +222,62 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         // ── Template Folder Location ────────────────────────────────────────
 
         const folderLocationSetting = new Setting(containerEl)
-            .setName("Template folder location")
-            .setDesc("Files in this folder will be available as templates.");
+            .setName('Template folder location')
+            .setDesc('Files in this folder will be available as templates.');
 
         folderLocationSetting.settingEl.classList.add('FZ-FolderSetting');
 
-        const suggestionDiv      = folderLocationSetting.settingEl.querySelector(".setting-item-control")!.createEl("div", { cls: "suggestion" });
-        const folderInput        = suggestionDiv.createEl("input", { attr: { id: "textbox-folder", type: "text" }});
+        const suggestionDiv = folderLocationSetting.settingEl
+            .querySelector('.setting-item-control')!
+            .createEl('div', { cls: 'suggestion' });
+        const folderInput = suggestionDiv.createEl('input', {
+            attr: { id: 'textbox-folder', type: 'text' },
+        });
         const templateFolderPath = this.plugin.settings.noteTemplatesFolder;
-        const verticalTabContent = document.getElementsByClassName("vertical-tab-content-container")[0];
-        const fuzzyListenerAttr  = verticalTabContent.getAttr("fuzzy-creator-listener");
+        const verticalTabContent = document.getElementsByClassName(
+            'vertical-tab-content-container',
+        )[0];
+        const fuzzyListenerAttr = verticalTabContent.getAttr(
+            'fuzzy-creator-listener',
+        );
 
-        folderInput.placeholder = "Template Folder"
+        folderInput.placeholder = 'Template Folder';
 
-        if (templateFolderPath === undefined || templateFolderPath === "") {
-            folderInput.value = "";
+        if (templateFolderPath === undefined || templateFolderPath === '') {
+            folderInput.value = '';
         } else {
             folderInput.value = templateFolderPath;
         }
 
         if (fuzzyListenerAttr == null) {
-            verticalTabContent.addEventListener("click", clickHandler);
-            verticalTabContent.setAttr("fuzzy-creator-listener", "true");
+            verticalTabContent.addEventListener('click', clickHandler);
+            verticalTabContent.setAttr('fuzzy-creator-listener', 'true');
         }
 
-        folderInput.addEventListener("input", () => createSuggestions(folderInput, this.plugin, this.app));
-        folderInput.addEventListener("focus", () => createSuggestions(folderInput, this.plugin, this.app));
+        folderInput.addEventListener('input', () =>
+            createSuggestions(folderInput, this.plugin, this.app),
+        );
+        folderInput.addEventListener('focus', () =>
+            createSuggestions(folderInput, this.plugin, this.app),
+        );
 
         // ── Functions & Callbacks ───────────────────────────────────────────
 
         function closeAllDropdowns() {
-            const dropdownMenu = document.getElementById("textbox-folder-dropdown-menu");
+            const dropdownMenu = document.getElementById(
+                'textbox-folder-dropdown-menu',
+            );
             if (dropdownMenu == null) {
                 return;
             }
             dropdownMenu.detach();
         }
 
-        function createSuggestions(folderInput: HTMLInputElement, plugin: FuzzyNoteCreatorPlugin, app: App) {
+        function createSuggestions(
+            folderInput: HTMLInputElement,
+            plugin: FuzzyNoteCreatorPlugin,
+            app: App,
+        ) {
             let dirs: string[] = [];
 
             const obsidianFolders = app.vault.getAllFolders();
@@ -247,38 +285,51 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
                 dirs.push(obsidianFolders[i].path);
             }
 
-            closeAllDropdowns()
+            closeAllDropdowns();
 
             const value = folderInput.value;
-            const newDiv = createEl("div", { cls: "dropdown-menu", attr: { id: `${folderInput.id}-dropdown-menu` }});
+            const newDiv = createEl('div', {
+                cls: 'dropdown-menu',
+                attr: { id: `${folderInput.id}-dropdown-menu` },
+            });
             if (folderInput.parentNode !== null) {
-                folderInput.parentNode.appendChild(newDiv)
+                folderInput.parentNode.appendChild(newDiv);
             }
 
-            const lengthOfSuggestions = (dirs.length < 5) ? dirs.length : 5;
+            const lengthOfSuggestions = dirs.length < 5 ? dirs.length : 5;
 
             for (let i = 0; i < dirs.length; i++) {
                 if (dirs[i].toLowerCase().contains(value.toLowerCase())) {
-                    const listElement = createEl("div", { text: `${dirs[i]}`, cls: "dropdown-item" });
-                    listElement.addEventListener("click", function() {
+                    const listElement = createEl('div', {
+                        text: `${dirs[i]}`,
+                        cls: 'dropdown-item',
+                    });
+                    listElement.addEventListener('click', function () {
                         if (listElement.textContent !== null) {
                             folderInput.value = listElement.textContent;
 
-                            plugin.settings.noteTemplatesFolder = folderInput.value;
+                            plugin.settings.noteTemplatesFolder =
+                                folderInput.value;
                             plugin.saveSettings();
                         }
                         closeAllDropdowns();
                     });
                     newDiv.appendChild(listElement);
-                    if (newDiv.childNodes.length === lengthOfSuggestions) {break;}
+                    if (newDiv.childNodes.length === lengthOfSuggestions) {
+                        break;
+                    }
                 }
             }
-            if (newDiv.childNodes.length === 0) {newDiv.hide();}
+            if (newDiv.childNodes.length === 0) {
+                newDiv.hide();
+            }
         }
 
         function clickHandler(event: UIEvent) {
-            const dropdown = document.getElementById("textbox-folder-dropdown-menu");
-            const textbox = document.getElementById("textbox-folder");
+            const dropdown = document.getElementById(
+                'textbox-folder-dropdown-menu',
+            );
+            const textbox = document.getElementById('textbox-folder');
             let clickedOnChild: boolean = false;
 
             if (dropdown === null) {
@@ -296,18 +347,32 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             }
         }
 
-        const userDate = (this.plugin.settings.dateFormat !== undefined && this.plugin.settings.dateFormat !== "") ? moment().format(this.plugin.settings.dateFormat) : moment().format('YYYY-MM-DD');
-        const descriptionDivDate = createEl("div", {text: `Inside your template you can put '{{date}}' which when the note is created its gonna be replaced with the value that you define on this setting. With your current settings {{date}} will be replaced with `});
-        descriptionDivDate.createEl("b", {text: userDate, cls: "u-pop", attr: {id: "userDate"}});
-        descriptionDivDate.createEl("span", {text: "."});
-        descriptionDivDate.createEl("br");
-        descriptionDivDate.createEl("br");
-        descriptionDivDate.createEl("span", {text: "You can also use {{date:YYYY-MM-DD}} to override the format."});
+        const userDate =
+            (
+                this.plugin.settings.dateFormat !== undefined &&
+                this.plugin.settings.dateFormat !== ''
+            ) ?
+                moment().format(this.plugin.settings.dateFormat)
+            :   moment().format('YYYY-MM-DD');
+        const descriptionDivDate = createEl('div', {
+            text: `Inside your template you can put '{{date}}' which when the note is created its gonna be replaced with the value that you define on this setting. With your current settings {{date}} will be replaced with `,
+        });
+        descriptionDivDate.createEl('b', {
+            text: userDate,
+            cls: 'u-pop',
+            attr: { id: 'userDate' },
+        });
+        descriptionDivDate.createEl('span', { text: '.' });
+        descriptionDivDate.createEl('br');
+        descriptionDivDate.createEl('br');
+        descriptionDivDate.createEl('span', {
+            text: 'You can also use {{date:YYYY-MM-DD}} to override the format.',
+        });
 
         const descriptionDate = new DocumentFragment();
-        descriptionDate.append(descriptionDivDate)
+        descriptionDate.append(descriptionDivDate);
 
-        const dateFormatSetting = new Setting(containerEl)
+        const dateFormatSetting = new Setting(containerEl);
         dateFormatSetting
             .setName('Date format')
             .setDesc(descriptionDate)
@@ -320,23 +385,40 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
                         this.plugin.settings.dateFormat = trimmedValue;
                         await this.plugin.saveSettings();
 
-                        const userDate = (trimmedValue !== "") ? moment().format(trimmedValue) : moment().format("YYYY-MM-DD");
-                        document.getElementById("userDate")!.setText(userDate);
+                        const userDate =
+                            trimmedValue !== '' ?
+                                moment().format(trimmedValue)
+                            :   moment().format('YYYY-MM-DD');
+                        document.getElementById('userDate')!.setText(userDate);
                     });
             });
 
-        const userTime = (this.plugin.settings.timeFormat !== undefined && this.plugin.settings.timeFormat !== "") ? moment().format(this.plugin.settings.timeFormat) : moment().format('HH:mm');
-        const descriptionDivTime = createEl("div", {text: `Inside your template you can put '{{time}}' which when the note is created its gonna be replaced with the value that you define on this setting. With your current settings {{time}} will be replaced with `});
-        descriptionDivTime.createEl("b", {text: userTime, cls: "u-pop", attr: {id: "userTime"}});
-        descriptionDivTime.createEl("span", {text: "."});
-        descriptionDivTime.createEl("br");
-        descriptionDivTime.createEl("br");
-        descriptionDivTime.createEl("span", {text: "You can also use {{time:YYYY-MM-DD}} to override the format."});
+        const userTime =
+            (
+                this.plugin.settings.timeFormat !== undefined &&
+                this.plugin.settings.timeFormat !== ''
+            ) ?
+                moment().format(this.plugin.settings.timeFormat)
+            :   moment().format('HH:mm');
+        const descriptionDivTime = createEl('div', {
+            text: `Inside your template you can put '{{time}}' which when the note is created its gonna be replaced with the value that you define on this setting. With your current settings {{time}} will be replaced with `,
+        });
+        descriptionDivTime.createEl('b', {
+            text: userTime,
+            cls: 'u-pop',
+            attr: { id: 'userTime' },
+        });
+        descriptionDivTime.createEl('span', { text: '.' });
+        descriptionDivTime.createEl('br');
+        descriptionDivTime.createEl('br');
+        descriptionDivTime.createEl('span', {
+            text: 'You can also use {{time:YYYY-MM-DD}} to override the format.',
+        });
 
         const descriptionTime = new DocumentFragment();
-        descriptionTime.append(descriptionDivTime)
+        descriptionTime.append(descriptionDivTime);
 
-        const timeFormatSetting = new Setting(containerEl)
+        const timeFormatSetting = new Setting(containerEl);
         timeFormatSetting
             .setName('Time format')
             .setDesc(descriptionTime)
@@ -349,8 +431,11 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
                         this.plugin.settings.timeFormat = trimmedValue;
                         await this.plugin.saveSettings();
 
-                        const userTime = (trimmedValue !== "") ? moment().format(trimmedValue) : moment().format("HH:mm");
-                        document.getElementById("userTime")!.setText(userTime);
+                        const userTime =
+                            trimmedValue !== '' ?
+                                moment().format(trimmedValue)
+                            :   moment().format('HH:mm');
+                        document.getElementById('userTime')!.setText(userTime);
                     });
             });
 
@@ -358,11 +443,13 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         // │                  Note Title Templates                   │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', {text: 'Note Title Templates'});
+        containerEl.createEl('h6', { text: 'Note Title Templates' });
 
         new Setting(containerEl)
             .setName('Use note title templates')
-            .setDesc('Whether to use templates that replace dates and are displayed to you when giving your note a title.')
+            .setDesc(
+                'Whether to use templates that replace dates and are displayed to you when giving your note a title.',
+            )
             .addToggle((slider) => {
                 slider
                     .setValue(this.plugin.settings.usingTitleTemplates)
@@ -375,13 +462,28 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
         const exampleDate = moment().format('YYYY-MM-DD');
 
         const templatesFragment = new DocumentFragment();
-        const templatesDescription = containerEl.createEl('div', {text: 'If you have note title templates turned on, you will see them when you are inputing your note title. For example, when you create a note with the template: '});
-        templatesDescription.createEl('b', {text: 'YYYY-MM-DD', cls: 'u-pop'});
-        templatesDescription.createEl('span', {text: ' it will be replaced for '});
-        templatesDescription.createEl('b', {text: `${exampleDate}`, cls: 'u-pop'});
-        templatesDescription.createEl('span', {text: ', this according to the formatting that you can see '});
-        templatesDescription.createEl('a', {text: 'here', href: 'https://momentjs.com/docs/#/displaying/format/'});
-        templatesDescription.createEl('span', {text: '.'});
+        const templatesDescription = containerEl.createEl('div', {
+            text: 'If you have note title templates turned on, you will see them when you are inputing your note title. For example, when you create a note with the template: ',
+        });
+        templatesDescription.createEl('b', {
+            text: 'YYYY-MM-DD',
+            cls: 'u-pop',
+        });
+        templatesDescription.createEl('span', {
+            text: ' it will be replaced for ',
+        });
+        templatesDescription.createEl('b', {
+            text: `${exampleDate}`,
+            cls: 'u-pop',
+        });
+        templatesDescription.createEl('span', {
+            text: ', this according to the formatting that you can see ',
+        });
+        templatesDescription.createEl('a', {
+            text: 'here',
+            href: 'https://momentjs.com/docs/#/displaying/format/',
+        });
+        templatesDescription.createEl('span', { text: '.' });
 
         templatesFragment.append(templatesDescription);
 
@@ -389,8 +491,7 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
             .setName('Note title templates')
             .setDesc(templatesFragment)
             .addTextArea((text) => {
-                text
-                    .setPlaceholder('YYYY-MM-DD')
+                text.setPlaceholder('YYYY-MM-DD')
                     .setValue(this.plugin.settings.titleTemplates)
                     .onChange(async (value) => {
                         const trimmedValue = value.trim();
@@ -398,18 +499,20 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
                         this.plugin.settings.titleTemplates = trimmedValue;
                         await this.plugin.saveSettings();
                     });
-                text.inputEl.setCssStyles({resize: "none"})
+                text.inputEl.setCssStyles({ resize: 'none' });
             });
 
         // ╭─────────────────────────────────────────────────────────╮
         // │                Override New Note Button                 │
         // ╰─────────────────────────────────────────────────────────╯
 
-        containerEl.createEl('h6', {text: 'Override New Note Button'});
+        containerEl.createEl('h6', { text: 'Override New Note Button' });
 
         new Setting(containerEl)
             .setName(`Override Obsidian's new note button`)
-            .setDesc(`When this option is turned on, the 'New Note' button located on top of the file explorer will function as a shortcut to the command that is defined on the 'Override command'.`)
+            .setDesc(
+                `When this option is turned on, the 'New Note' button located on top of the file explorer will function as a shortcut to the command that is defined on the 'Override command'.`,
+            )
             .addToggle((slider) => {
                 slider
                     .setValue(this.plugin.settings.overrideNewNote)
@@ -427,20 +530,25 @@ export class FuzzyNoteCreatorSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName(`Override command`)
-            .setDesc(`The command that will be called when you click Obsidian's 'New note' button.`)
+            .setDesc(
+                `The command that will be called when you click Obsidian's 'New note' button.`,
+            )
             .addDropdown((dropdown) => {
                 dropdown
                     .addOptions({
-                        "new-tab":               "New Tab",
-                        "current-tab":           "Current Tab",
-                        "new-window":            "New Window",
-                        "split-horizontal":      "Current Window: spliting horizontally",
-                        "split-vertical":        "Current Window: spliting vertically",
-                        "bulk-new-tab":          "Bulk note creation: New Tab",
-                        "bulk-current-tab":      "Bulk note creation: Current Tab",
-                        "bulk-new-window":       "Bulk note creation: New Window",
-                        "bulk-split-horizontal": "Bulk note creation: horizontal splits",
-                        "bulk-split-vertical":   "Bulk note creation: vertical splits",
+                        'new-tab': 'New Tab',
+                        'current-tab': 'Current Tab',
+                        'new-window': 'New Window',
+                        'split-horizontal':
+                            'Current Window: spliting horizontally',
+                        'split-vertical': 'Current Window: spliting vertically',
+                        'bulk-new-tab': 'Bulk note creation: New Tab',
+                        'bulk-current-tab': 'Bulk note creation: Current Tab',
+                        'bulk-new-window': 'Bulk note creation: New Window',
+                        'bulk-split-horizontal':
+                            'Bulk note creation: horizontal splits',
+                        'bulk-split-vertical':
+                            'Bulk note creation: vertical splits',
                     })
                     .setValue(this.plugin.settings.overrideCommand)
                     .onChange(async (value: string) => {

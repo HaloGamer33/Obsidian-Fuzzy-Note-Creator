@@ -1,5 +1,9 @@
 import { Plugin } from 'obsidian';
-import { FuzzyNoteCreatorSettingTab, FuzzyNoteCreatorSettings, DEFAULT_SETTINGS } from './settingsTab';
+import {
+    FuzzyNoteCreatorSettingTab,
+    FuzzyNoteCreatorSettings,
+    DEFAULT_SETTINGS,
+} from './settingsTab';
 import { AddCommands } from './commands';
 import { OverrideNewNote, RestoreNewNote } from './override-new-note';
 
@@ -11,7 +15,11 @@ export default class FuzzyNoteCreatorPlugin extends Plugin {
     }
 
     async onload() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        this.settings = Object.assign(
+            {},
+            DEFAULT_SETTINGS,
+            await this.loadData(),
+        );
 
         // Arguments: (app, plugin)
         this.addSettingTab(new FuzzyNoteCreatorSettingTab(this.app, this));
